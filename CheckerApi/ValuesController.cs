@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CheckerApi
@@ -8,38 +7,41 @@ namespace CheckerApi
     public class ValuesController : Controller
     {
         private readonly string _password;
+        private readonly ApiContext _context;
 
-        public ValuesController()
+        public ValuesController(ApiContext context)
         {
             _password = Storage.Password;
+            _context = context;
         }
 
         [HttpGet]
         [Route("data/{top}")]
         public IActionResult Get(int top)
         {
-            return Ok(Storage.ExtendedData.TakeLast(top));
+            return Ok(_context.Data.OrderByDescending(i => i.RecordDate).Take(top).ToList());
         }
 
         [HttpGet]
         [Route("data")]
-        public IActionResult Get10(int top)
+        public IActionResult Get10()
         {
-            return Ok(Storage.ExtendedData.TakeLast(10));
+            return Ok(_context.Data.OrderByDescending(i => i.RecordDate).Take(10).ToList());
         }
 
         [HttpGet]
         [Route("")]
         public IActionResult Status()
         {
+            var config = _context.Configurations.First();
             return Ok(new
             {
                 Status = "Running",
-                FoundOrders = Storage.Data.Count,
+                FoundOrders = _context.Data.Count(),
                 Commands = new[] {
-                        $"/acceptedspeed ({Storage.AcceptedSpeed})",
-                        $"/limitspeed ({Storage.LimitSpeed})",
-                        $"/pricethreshold ({Storage.PriceThreshold})",
+                        $"/acceptedspeed ({config.AcceptedSpeed})",
+                        $"/limitspeed ({config.LimitSpeed})",
+                        $"/pricethreshold ({config.PriceThreshold})",
                         "/data",
                         "/data/100"}
             });
@@ -51,14 +53,19 @@ namespace CheckerApi
         {
             if (_password != password)
                 return NotFound();
-            return Ok(Storage.AcceptedSpeed = rate);
+
+            var config = _context.Configurations.First();
+            config.AcceptedSpeed = rate;
+            _context.Update(config);
+            _context.SaveChanges();
+            return Ok(rate);
         }
 
         [HttpGet]
         [Route("acceptedspeed")]
         public IActionResult GetAcceptedSpeed(double rate)
         {
-            return Ok(Storage.AcceptedSpeed);
+            return Ok(_context.Configurations.First().AcceptedSpeed);
         }
 
         [HttpGet]
@@ -67,14 +74,18 @@ namespace CheckerApi
         {
             if (_password != password)
                 return NotFound();
-            return Ok(Storage.LimitSpeed = rate);
+            var config = _context.Configurations.First();
+            config.LimitSpeed = rate;
+            _context.Update(config);
+            _context.SaveChanges();
+            return Ok(rate);
         }
 
         [HttpGet]
         [Route("limitspeed")]
         public IActionResult GetLimitSpeed(double rate)
         {
-            return Ok(Storage.LimitSpeed);
+            return Ok(_context.Configurations.First().LimitSpeed);
         }
 
         [HttpGet]
@@ -83,25 +94,18 @@ namespace CheckerApi
         {
             if (_password != password)
                 return NotFound();
-            return Ok(Storage.PriceThreshold = rate);
+            var config = _context.Configurations.First();
+            config.PriceThreshold = rate;
+            _context.Update(config);
+            _context.SaveChanges();
+            return Ok(rate);
         }
 
         [HttpGet]
         [Route("pricethreshold")]
         public IActionResult GetPriceThreshold(double rate)
         {
-            return Ok(Storage.PriceThreshold);
-        }
-
-        [HttpGet]
-        [Route("restart/{password}")]
-        public IActionResult Restart(double rate, string password)
-        {
-            if (_password != password)
-                return NotFound();
-            Storage.ExtendedData = new List<ExtendedData>();
-            Storage.Data = new Dictionary<string, Data>();
-            return Ok();
+            return Ok(_context.Configurations.First().PriceThreshold);
         }
     }
 }
