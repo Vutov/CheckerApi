@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using CheckerApi.DTO;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -27,49 +28,39 @@ namespace CheckerApi
             _serviceProvider = serviceProvider;
         }
 
-        public Task Run()
+        public void Run(ApiContext context)
         {
             _logger.LogInformation("Sync Started");
             var locations = new[] { 0, 1 };
 
-            return Task.Run(() =>
+            try
             {
-                while (true)
+                var config = context.Configurations.FirstAsync().Result;
+                foreach (var location in locations)
                 {
-                    Task.Delay(TimeSpan.FromSeconds(15)).Wait();
-                    using (var context = _serviceProvider.GetService<ApiContext>())
-                    {
-                        try
-                        {
-                            var config = context.Configurations.First();
-                            foreach (var location in locations)
-                            {
-                                var client = new RestClient("https://api.nicehash.com/");
-                                var request = new RestRequest(
-                                    $"api?method=orders.get&location={location}&algo=24",
-                                    Method.GET);
-                                var response = client.Execute(request);
-                                var data = JsonConvert.DeserializeObject<ResultDTO>(response.Content);
+                    var client = new RestClient("https://api.nicehash.com/");
+                    var request = new RestRequest(
+                        $"api?method=orders.get&location={location}&algo=24",
+                        Method.GET);
+                    var response = client.Execute(request);
+                    var data = JsonConvert.DeserializeObject<ResultDTO>(response.Content);
 
-                                var orders = data.Result.Orders;
-                                var foundOrders = new List<DataDB>();
-                                foundOrders.AddRange(AcceptedSpeedCondition(orders, location, config));
-                                foundOrders.AddRange(SignOfAttack(orders, location, config));
-                                if (foundOrders.Any())
-                                {
-                                    TriggerHook(context);
-                                    context.Data.AddRange(foundOrders);
-                                    context.SaveChanges();
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            _logger.LogError(e.ToString());
-                        }
+                    var orders = data.Result.Orders;
+                    var foundOrders = new List<DataDB>();
+                    foundOrders.AddRange(AcceptedSpeedCondition(orders, location, config));
+                    foundOrders.AddRange(SignOfAttack(orders, location, config));
+                    if (foundOrders.Any())
+                    {
+                        TriggerHook(context);
+                        context.Data.AddRange(foundOrders);
+                        context.SaveChanges();
                     }
                 }
-            });
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e.ToString());
+            }
         }
 
         private List<DataDB> AcceptedSpeedCondition(IEnumerable<DataDTO> orders, int location, Configuration config)
