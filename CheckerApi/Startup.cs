@@ -1,4 +1,7 @@
 ﻿using AutoMapper;
+using CheckerApi.Context;
+using CheckerApi.Services;
+using CheckerApi.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -9,9 +12,14 @@ namespace CheckerApi
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IHostingEnvironment env)
         {
-            Configuration = configuration;
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddEnvironmentVariables();
+            Configuration = builder.Build();
         }
 
         public IConfiguration Configuration { get; }
@@ -22,7 +30,9 @@ namespace CheckerApi
             
             services.AddDbContext<ApiContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("Connection")));
-            services.AddTransient<Sync>();
+            services.AddTransient<ISyncService, SyncService>();
+            services.AddTransient<INotificationManager, NotificationManager>();
+            services.AddTransient<IConditionComplier, ConditionComplier>();
 
             services.AddMvc();
         }

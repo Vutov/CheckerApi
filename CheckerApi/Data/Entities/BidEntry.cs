@@ -1,9 +1,10 @@
 ﻿using System;
-using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CheckerApi.DTO
+namespace CheckerApi.Data.Entities
 {
-    public class DataDB
+    [Table("Data")]
+    public class BidEntry
     {
         public int ID { get; set; }
         public DateTime RecordDate { get; set; }

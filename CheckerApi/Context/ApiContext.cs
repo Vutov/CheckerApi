@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CheckerApi.DTO;
+using CheckerApi.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace CheckerApi
+namespace CheckerApi.Context
 {
     public class ApiContext : DbContext
     {
@@ -12,21 +12,21 @@ namespace CheckerApi
         {
         }
 
-        public DbSet<DataDB> Data { get; set; }
-        public DbSet<Configuration> Configurations { get; set; }
+        public DbSet<BidEntry> Data { get; set; }
+        public DbSet<ApiConfiguration> Configurations { get; set; }
 
         public void Seed()
         {
             if (!this.Configurations.Any())
             {
-                var config = new List<Configuration>
+                var config = new List<ApiConfiguration>
                 {
-                    new Configuration()
+                    new ApiConfiguration()
                     {
                         AcceptedSpeed = 0.02,
                         LimitSpeed = 11,
                         PriceThreshold = 0.03,
-                        LastNotification = DateTime.UtcNow.AddMinutes(-5)
+                        LastNotification = DateTime.UtcNow.AddMinutes(-15)
                     }
                 };
 

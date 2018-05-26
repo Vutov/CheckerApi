@@ -1,32 +1,30 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using CheckerApi.Context;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace CheckerApi
+namespace CheckerApi.Controllers
 {
     [Route("")]
-    public class ValuesController : Controller
+    public class MainController : Controller
     {
         private readonly string _password;
         private readonly ApiContext _context;
 
-        public ValuesController(ApiContext context)
+        public MainController(IServiceProvider serviceProvider)
         {
-            _password = Storage.Password;
-            _context = context;
+            var config = serviceProvider.GetService<IConfiguration>();
+            _password = config.GetValue<string>("Api:Password");
+            _context = serviceProvider.GetService<ApiContext>();
         }
 
         [HttpGet]
-        [Route("data/{top}")]
-        public IActionResult Get(int top)
+        [Route("data/{top?}")]
+        public IActionResult Get(int top = 10)
         {
             return Ok(_context.Data.OrderByDescending(i => i.RecordDate).Take(top).ToList());
-        }
-
-        [HttpGet]
-        [Route("data")]
-        public IActionResult Get10()
-        {
-            return Ok(_context.Data.OrderByDescending(i => i.RecordDate).Take(10).ToList());
         }
 
         [HttpGet]
@@ -48,8 +46,8 @@ namespace CheckerApi
         }
 
         [HttpGet]
-        [Route("acceptedspeed/{rate}/{password}")]
-        public IActionResult SetAcceptedSpeed(double rate, string password)
+        [Route("acceptedspeed/{rate}/{password?}")]
+        public IActionResult SetAcceptedSpeed(double rate, string password = "")
         {
             if (_password != password)
                 return NotFound();
@@ -58,6 +56,7 @@ namespace CheckerApi
             config.AcceptedSpeed = rate;
             _context.Update(config);
             _context.SaveChanges();
+
             return Ok(rate);
         }
 
@@ -69,15 +68,17 @@ namespace CheckerApi
         }
 
         [HttpGet]
-        [Route("limitspeed/{rate}/{password}")]
-        public IActionResult SetLimitSpeed(double rate, string password)
+        [Route("limitspeed/{rate}/{password?}")]
+        public IActionResult SetLimitSpeed(double rate, string password = "")
         {
             if (_password != password)
                 return NotFound();
+
             var config = _context.Configurations.First();
             config.LimitSpeed = rate;
             _context.Update(config);
             _context.SaveChanges();
+
             return Ok(rate);
         }
 
@@ -89,15 +90,17 @@ namespace CheckerApi
         }
 
         [HttpGet]
-        [Route("pricethreshold/{rate}/{password}")]
-        public IActionResult SetPriceThreshold(double rate, string password)
+        [Route("pricethreshold/{rate}/{password?}")]
+        public IActionResult SetPriceThreshold(double rate, string password = "")
         {
             if (_password != password)
                 return NotFound();
+
             var config = _context.Configurations.First();
             config.PriceThreshold = rate;
             _context.Update(config);
             _context.SaveChanges();
+
             return Ok(rate);
         }
 

@@ -12,10 +12,10 @@ namespace CheckerApi.DTO
     class OrdersDTO
     {
         [JsonProperty(PropertyName = "orders")]
-        public IEnumerable<DataDTO> Orders { get; set; }
+        public IEnumerable<BidDTO> Orders { get; set; }
     }
 
-    public class DataDTO
+    public class BidDTO
     {
         [JsonProperty(PropertyName = "limit_speed")]
         public double LimitSpeed { get; set; }

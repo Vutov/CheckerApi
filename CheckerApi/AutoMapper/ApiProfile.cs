@@ -1,14 +1,15 @@
 ﻿using System;
 using AutoMapper;
+using CheckerApi.Data.Entities;
 using CheckerApi.DTO;
 
 namespace CheckerApi
 {
-    public class AutomapperProfile : Profile
+    public class ApiProfile : Profile
     {
-        public AutomapperProfile()
+        public ApiProfile()
         {
-            CreateMap<DataDTO, DataDB>()
+            CreateMap<BidDTO, BidEntry>()
                 .ForMember(dest => dest.ID,
                     opt => opt.Ignore())
                 .ForMember(dest => dest.NiceHashId,

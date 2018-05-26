@@ -272,3 +272,6 @@ __pycache__/
 *.docx
 [Ss]ensitive/
 */wwwroot/lib/
+*.Development.json
+*.Production.json
+errorlogs.txt
