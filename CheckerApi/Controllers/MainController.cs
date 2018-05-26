@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using CheckerApi.Context;
+using CheckerApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,10 +13,12 @@ namespace CheckerApi.Controllers
     {
         private readonly string _password;
         private readonly ApiContext _context;
+        private readonly IServiceProvider _serviceProvider;
 
         public MainController(IServiceProvider serviceProvider)
         {
-            var config = serviceProvider.GetService<IConfiguration>();
+            _serviceProvider = serviceProvider;
+            var config = _serviceProvider.GetService<IConfiguration>();
             _password = config.GetValue<string>("Api:Password");
             _context = serviceProvider.GetService<ApiContext>();
         }
@@ -109,6 +112,21 @@ namespace CheckerApi.Controllers
         public IActionResult GetPriceThreshold(double rate)
         {
             return Ok(_context.Configurations.First().PriceThreshold);
+        }
+
+        [HttpGet]
+        [Route("testnotifications/{password?}")]
+        public IActionResult TestNotifications(string password = "")
+        {
+            if (_password != password)
+                return NotFound();
+
+            var notification = _serviceProvider.GetService<INotificationManager>();
+            var result = notification.TriggerHook("Manual notification test, please ignore");
+            if (result.HasFailed())
+                return BadRequest();
+
+            return Ok();
         }
     }
 }
