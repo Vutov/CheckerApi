@@ -72,7 +72,7 @@ namespace CheckerApi.Services
                 foundOrders.Add(top2[0]);
                 _logger.LogInformation(ordStr);
             }
-            
+
             if (foundOrders.Any())
             {
                 return (foundOrders,
@@ -87,19 +87,22 @@ namespace CheckerApi.Services
         private string CreateMessage(BidEntry order)
         {
             var speedLimit = order.LimitSpeed == 0 ? "NO" : order.LimitSpeed.ToString(CultureInfo.InvariantCulture);
-            return $"{order.AcceptedSpeed * 100} MSol DELIVERED AT {order.RecordDate:G} WITH {speedLimit} LIMIT, PAYING {order.Price} ON ORDER ID {order.NiceHashId} AT {_locationDict[order.NiceHashDataCenter]} SERVER";
+            return $"{order.AcceptedSpeed * 1000} MSol DELIVERED AT {order.RecordDate:G} WITH {speedLimit} LIMIT, PAYING {order.Price} ON ORDER ID {order.NiceHashId} AT {_locationDict[order.NiceHashDataCenter]} SERVER";
         }
 
         private string Sha256(string randomString)
         {
-            var crypt = new SHA256Managed();
-            var hash = new StringBuilder();
-            byte[] crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(randomString));
-            foreach (byte theByte in crypto)
+            using (var crypt = new SHA256Managed())
             {
-                hash.Append(theByte.ToString("x2"));
+                var hash = new StringBuilder();
+                byte[] crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(randomString));
+                foreach (byte theByte in crypto)
+                {
+                    hash.Append(theByte.ToString("x2"));
+                }
+
+                return hash.ToString();
             }
-            return hash.ToString();
         }
     }
 }
