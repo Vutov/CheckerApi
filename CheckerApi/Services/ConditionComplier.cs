@@ -61,13 +61,18 @@ namespace CheckerApi.Services
         {
             var foundOrders = new List<BidEntry>();
             var top2 = orders.Where(o => o.Alive).OrderByDescending(o => o.Price).Take(2).ToList();
-            if (top2[0].Price + config.PriceThreshold >= top2[1].Price &&
+            if (top2.Count < 2)
+            {
+                return (foundOrders, string.Empty, string.Empty);
+            }
+
+            var ordStr = JsonConvert.SerializeObject(top2[0]);
+            var hash = Sha256(ordStr);
+            if (!DataHashes.Contains(hash) &&
+                top2[0].Price - config.PriceThreshold >= top2[1].Price &&
                (top2[0].LimitSpeed == 0 || top2[0].LimitSpeed >= config.LimitSpeed)
             )
             {
-                var ordStr = JsonConvert.SerializeObject(top2[0]);
-                var hash = Sha256(ordStr);
-
                 DataHashes.Add(hash);
                 foundOrders.Add(top2[0]);
                 _logger.LogInformation(ordStr);
@@ -76,7 +81,7 @@ namespace CheckerApi.Services
             if (foundOrders.Any())
             {
                 return (foundOrders,
-                        $"Order Alive ({top2[0].Alive}) AND Order Price ({top2[0].Price}) + '{config.PriceThreshold}' >= Second Order Price ({top2[1].Price}, ID: {top2[1].NiceHashId}) AND Order Speed Limit ({top2[0].LimitSpeed}) = 0 OR Order Speed Limit ({top2[0].LimitSpeed}) >= '{config.LimitSpeed}'",
+                        $"Order Alive ({top2[0].Alive}) AND Order Price ({top2[0].Price}) - '{config.PriceThreshold}' >= Second Order Price ({top2[1].Price}, ID: {top2[1].NiceHashId}) AND Order Speed Limit ({top2[0].LimitSpeed}) = 0 OR Order Speed Limit ({top2[0].LimitSpeed}) >= '{config.LimitSpeed}'",
                         $"SUSPICIOUS BID ALERT - an attack may be about to begin. {this.CreateMessage(top2[0])}"
                     );
             }

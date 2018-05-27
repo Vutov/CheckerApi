@@ -9,12 +9,14 @@ namespace CheckerApi.Services
 {
     public class NotificationManager : INotificationManager
     {
+        private readonly IRestClient _client;
         private readonly string _domain;
         private readonly string _uri;
         private readonly ILogger<NotificationManager> _logger;
 
-        public NotificationManager(IConfiguration configuration, ILogger<NotificationManager> logger)
+        public NotificationManager(IRestClient client, IConfiguration configuration, ILogger<NotificationManager> logger)
         {
+            _client = client;
             _domain = configuration.GetValue<string>("Trigger:Domain");
             _uri = configuration.GetValue<string>("Trigger:Uri");
             _logger = logger;
@@ -26,7 +28,7 @@ namespace CheckerApi.Services
 
             try
             {
-                var hook = new RestClient(_domain);
+                _client.BaseUrl = new Uri(_domain);
                 var req = new RestRequest(_uri, Method.POST);
                 for (int i = 0; i < messages.Length; i++)
                 {
@@ -36,7 +38,7 @@ namespace CheckerApi.Services
                     req.AddParameter($"value{i + 1}", message, ParameterType.GetOrPost);
                 }
 
-                var res = hook.Execute(req);
+                var res = _client.Execute(req);
 
                 return Result.Ok();
             }

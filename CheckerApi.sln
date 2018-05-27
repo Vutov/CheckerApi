@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2000
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckerApi", "CheckerApi\CheckerApi.csproj", "{98568C37-0BC6-44DF-B209-47B1EE446877}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CheckerApi", "CheckerApi\CheckerApi.csproj", "{98568C37-0BC6-44DF-B209-47B1EE446877}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckerApi.UnitTests", "CheckerApi.UnitTests\CheckerApi.UnitTests.csproj", "{0C60B1DC-EB0D-4A78-877F-BAA2F1A77718}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{98568C37-0BC6-44DF-B209-47B1EE446877}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98568C37-0BC6-44DF-B209-47B1EE446877}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98568C37-0BC6-44DF-B209-47B1EE446877}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C60B1DC-EB0D-4A78-877F-BAA2F1A77718}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C60B1DC-EB0D-4A78-877F-BAA2F1A77718}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C60B1DC-EB0D-4A78-877F-BAA2F1A77718}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C60B1DC-EB0D-4A78-877F-BAA2F1A77718}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RestSharp;
 
 namespace CheckerApi
 {
@@ -33,6 +34,7 @@ namespace CheckerApi
             services.AddTransient<ISyncService, SyncService>();
             services.AddTransient<INotificationManager, NotificationManager>();
             services.AddTransient<IConditionComplier, ConditionComplier>();
+            services.AddTransient<IRestClient, RestClient>();
 
             services.AddMvc();
         }
