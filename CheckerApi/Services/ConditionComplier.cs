@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using Accord.Statistics;
 using CheckerApi.Data.Entities;
 using CheckerApi.Services.Interfaces;
 using Microsoft.Extensions.Logging;
