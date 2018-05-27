@@ -2,9 +2,11 @@
 using System.Linq;
 using CheckerApi.Context;
 using CheckerApi.Services.Interfaces;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.IO;
 
 namespace CheckerApi.Controllers
 {
@@ -127,6 +129,20 @@ namespace CheckerApi.Controllers
                 return BadRequest();
 
             return Ok();
+        }
+
+        [HttpGet]
+        [Route("version")]
+        public IActionResult GetVersion()
+        {
+            var env = _serviceProvider.GetService<IHostingEnvironment>();
+            var build = System.IO.File.ReadAllText("./version.txt");
+            return Ok(new
+            {
+                BuildDate = build,
+                Environment = env.EnvironmentName,
+                Name = env.ApplicationName
+            });
         }
     }
 }

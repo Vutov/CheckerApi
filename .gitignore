@@ -275,3 +275,4 @@ __pycache__/
 *.Development.json
 *.Production.json
 errorlogs.txt
+version.txt

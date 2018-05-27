@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using CheckerApi.Context;
 using CheckerApi.Services.Interfaces;
@@ -16,6 +17,7 @@ namespace CheckerApi
     {
         public static void Main(string[] args)
         {
+            File.WriteAllText("./version.txt", $"{DateTime.UtcNow:G}");
             var host = BuildWebHost(args);
             using (var serviceScope = host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
