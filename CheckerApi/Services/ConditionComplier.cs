@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Accord.Statistics;
 using CheckerApi.Data.Entities;
 using CheckerApi.Services.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -26,7 +28,7 @@ namespace CheckerApi.Services
             _logger = logger;
         }
 
-        public (IEnumerable<BidEntry> bids, string condition, string message) AcceptedSpeedCondition(IEnumerable<BidEntry> orders, int location, ApiConfiguration config)
+        public (IEnumerable<BidEntry> bids, string condition, string message) AcceptedSpeedCondition(IEnumerable<BidEntry> orders, ApiConfiguration config)
         {
             var foundOrders = new List<BidEntry>();
             foreach (var order in orders)
@@ -57,7 +59,7 @@ namespace CheckerApi.Services
             return (foundOrders, string.Empty, string.Empty);
         }
 
-        public (IEnumerable<BidEntry> bids, string condition, string message) SignOfAttack(IEnumerable<BidEntry> orders, int location, ApiConfiguration config)
+        public (IEnumerable<BidEntry> bids, string condition, string message) SignOfAttack(IEnumerable<BidEntry> orders, ApiConfiguration config)
         {
             var foundOrders = new List<BidEntry>();
             var top2 = orders.Where(o => o.Alive).OrderByDescending(o => o.Price).Take(2).ToList();

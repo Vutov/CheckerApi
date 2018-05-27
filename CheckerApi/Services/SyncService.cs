@@ -58,14 +58,14 @@ namespace CheckerApi.Services
                     var orders = data.Result.Orders.Select(o => CreateDTO(o, location)).ToList();
                     var foundOrders = new List<BidEntry>();
 
-                    var foundSpeedBids = _condition.AcceptedSpeedCondition(orders, location, config);
+                    var foundSpeedBids = _condition.AcceptedSpeedCondition(orders, config);
                     if (foundSpeedBids.bids.Any())
                     {
                         this.TriggerHook(foundSpeedBids.condition, foundSpeedBids.message);
                         foundOrders.AddRange(foundSpeedBids.bids);
                     }
 
-                    var foundSignBids = _condition.SignOfAttack(orders, location, config);
+                    var foundSignBids = _condition.SignOfAttack(orders, config);
                     if (foundSignBids.bids.Any())
                     {
                         this.TriggerHook(foundSignBids.condition, foundSignBids.message);

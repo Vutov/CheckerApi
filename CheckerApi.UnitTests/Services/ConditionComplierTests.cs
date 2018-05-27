@@ -36,7 +36,7 @@ namespace CheckerApi.UnitTests.Services
             };
 
             // Act
-            var data = complier.AcceptedSpeedCondition(this.GetLargeBidSet(id), 0, config);
+            var data = complier.AcceptedSpeedCondition(this.GetLargeBidSet(id), config);
 
             // Assert
             Assert.IsFalse(data.bids.Any());
@@ -61,7 +61,7 @@ namespace CheckerApi.UnitTests.Services
             };
 
             // Act
-            var data = complier.AcceptedSpeedCondition(orders, 0, config);
+            var data = complier.AcceptedSpeedCondition(orders, config);
 
             // Assert
             Assert.AreEqual(1, data.bids.Count());
@@ -96,7 +96,7 @@ namespace CheckerApi.UnitTests.Services
             };
 
             // Act
-            var data = complier.AcceptedSpeedCondition(orders, 0, config);
+            var data = complier.AcceptedSpeedCondition(orders, config);
 
             // Assert
             Assert.AreEqual(2, data.bids.Count());
@@ -123,8 +123,8 @@ namespace CheckerApi.UnitTests.Services
             };
 
             // Act
-            var data = complier.AcceptedSpeedCondition(orders, 0, config);
-            var data1 = complier.AcceptedSpeedCondition(orders, 0, config);
+            var data = complier.AcceptedSpeedCondition(orders, config);
+            var data1 = complier.AcceptedSpeedCondition(orders, config);
 
             // Assert
             Assert.AreEqual(1, data.bids.Count());
@@ -145,7 +145,7 @@ namespace CheckerApi.UnitTests.Services
             };
 
             // Act
-            var data = complier.SignOfAttack(this.GetSignBidSet(id), 0, config);
+            var data = complier.SignOfAttack(this.GetSignBidSet(id), config);
 
             // Assert
             Assert.IsFalse(data.bids.Any());
@@ -178,7 +178,7 @@ namespace CheckerApi.UnitTests.Services
             };
 
             // Act
-            var data = complier.SignOfAttack(orders, 0, config);
+            var data = complier.SignOfAttack(orders, config);
 
             // Assert
             Assert.AreEqual(1, data.bids.Count());
@@ -211,7 +211,7 @@ namespace CheckerApi.UnitTests.Services
             };
 
             // Act
-            var data = complier.SignOfAttack(orders, 0, config);
+            var data = complier.SignOfAttack(orders, config);
 
             // Assert
             Assert.AreEqual(1, data.bids.Count());
@@ -246,8 +246,8 @@ namespace CheckerApi.UnitTests.Services
             };
 
             // Act
-            var data = complier.SignOfAttack(orders, 0, config);
-            var data1 = complier.SignOfAttack(orders, 0, config);
+            var data = complier.SignOfAttack(orders, config);
+            var data1 = complier.SignOfAttack(orders, config);
 
             // Assert
             Assert.AreEqual(1, data.bids.Count());
