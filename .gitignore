@@ -276,4 +276,4 @@ __pycache__/
 *.Production.json
 errorlogs.txt
 version.txt
-Properties/*
+*launchSettings.json
