@@ -47,7 +47,7 @@ namespace CheckerApi.Services
             
             try
             {
-                var config = _context.Configurations.FirstAsync().Result;
+                var config = _context.Configurations.OrderBy(o => o.ID).First();
                 foreach (var location in _locations)
                 {
                     var client = new RestClient("https://api.nicehash.com/");
@@ -94,7 +94,7 @@ namespace CheckerApi.Services
         private void TriggerHook(string condition, string message)
         {
             var alert = string.Empty;
-            var config = _context.Configurations.First();
+            var config = _context.Configurations.OrderBy(o => o.ID).First();
             if (DateTime.UtcNow.AddMinutes(-_alertInterval) >= config.LastNotification)
             {
                 alert = _alertMessage;

@@ -36,7 +36,7 @@ namespace CheckerApi.Controllers
         [Route("")]
         public IActionResult Status()
         {
-            var config = _context.Configurations.First();
+            var config = _context.Configurations.OrderBy(o => o.ID).First();
             return Ok(new
             {
                 Status = "Running",
@@ -57,7 +57,7 @@ namespace CheckerApi.Controllers
             if (_password != password)
                 return NotFound();
 
-            var config = _context.Configurations.First();
+            var config = _context.Configurations.OrderBy(o => o.ID).First();
             config.AcceptedSpeed = rate;
             _context.Update(config);
             _context.SaveChanges();
@@ -69,7 +69,7 @@ namespace CheckerApi.Controllers
         [Route("acceptedspeed")]
         public IActionResult GetAcceptedSpeed(double rate)
         {
-            return Ok(_context.Configurations.First().AcceptedSpeed);
+            return Ok(_context.Configurations.OrderBy(o => o.ID).First().AcceptedSpeed);
         }
 
         [HttpGet]
@@ -79,7 +79,7 @@ namespace CheckerApi.Controllers
             if (_password != password)
                 return NotFound();
 
-            var config = _context.Configurations.First();
+            var config = _context.Configurations.OrderBy(o => o.ID).First();
             config.LimitSpeed = rate;
             _context.Update(config);
             _context.SaveChanges();
@@ -91,7 +91,7 @@ namespace CheckerApi.Controllers
         [Route("limitspeed")]
         public IActionResult GetLimitSpeed(double rate)
         {
-            return Ok(_context.Configurations.First().LimitSpeed);
+            return Ok(_context.Configurations.OrderBy(o => o.ID).First().LimitSpeed);
         }
 
         [HttpGet]
@@ -101,7 +101,7 @@ namespace CheckerApi.Controllers
             if (_password != password)
                 return NotFound();
 
-            var config = _context.Configurations.First();
+            var config = _context.Configurations.OrderBy(o => o.ID).First();
             config.PriceThreshold = rate;
             _context.Update(config);
             _context.SaveChanges();
@@ -113,7 +113,7 @@ namespace CheckerApi.Controllers
         [Route("pricethreshold")]
         public IActionResult GetPriceThreshold(double rate)
         {
-            return Ok(_context.Configurations.First().PriceThreshold);
+            return Ok(_context.Configurations.OrderBy(o => o.ID).First().PriceThreshold);
         }
 
         [HttpGet]
