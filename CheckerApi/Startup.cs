@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CheckerApi.Context;
+using CheckerApi.Extensions;
 using CheckerApi.Services;
 using CheckerApi.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
@@ -41,6 +42,8 @@ namespace CheckerApi
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.SetupHttpsRedirect(Configuration, env);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

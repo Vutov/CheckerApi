@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using CheckerApi.Context;
+using CheckerApi.Extensions;
 using CheckerApi.Services.Interfaces;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -57,6 +58,7 @@ namespace CheckerApi
 
                     SelfLog.Enable(Console.Error);
                 })
+                .UseKestrel(options => options.ConfigureEndpoints())
                 .Build();
     }
 }
