@@ -4,24 +4,40 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore.Storage.Internal;
+using MySql.Data.EntityFrameworkCore.Storage.Internal;
 using System;
 
 namespace CheckerApi.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    [Migration("20180520100523_AddedLocation")]
-    partial class AddedLocation
+    [Migration("20180602135031_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.0.3-rtm-10026")
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "2.0.3-rtm-10026");
 
-            modelBuilder.Entity("CheckerApi.DTO.DataDB", b =>
+            modelBuilder.Entity("CheckerApi.Data.Entities.ApiConfiguration", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<double>("AcceptedSpeed");
+
+                    b.Property<DateTime>("LastNotification");
+
+                    b.Property<double>("LimitSpeed");
+
+                    b.Property<double>("PriceThreshold");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Configurations");
+                });
+
+            modelBuilder.Entity("CheckerApi.Data.Entities.BidEntry", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();

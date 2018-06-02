@@ -30,7 +30,7 @@ namespace CheckerApi
             services.AddAutoMapper();
             
             services.AddDbContext<ApiContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("Connection")));
+                options.UseMySQL(Configuration.GetConnectionString("Connection")));
             services.AddTransient<ISyncService, SyncService>();
             services.AddTransient<INotificationManager, NotificationManager>();
             services.AddTransient<IConditionComplier, ConditionComplier>();

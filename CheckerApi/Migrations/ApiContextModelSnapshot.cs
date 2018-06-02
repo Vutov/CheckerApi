@@ -4,8 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore.Storage.Internal;
+using MySql.Data.EntityFrameworkCore.Storage.Internal;
 using System;
 
 namespace CheckerApi.Migrations
@@ -17,10 +16,9 @@ namespace CheckerApi.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.0.3-rtm-10026")
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "2.0.3-rtm-10026");
 
-            modelBuilder.Entity("CheckerApi.DTO.Configuration", b =>
+            modelBuilder.Entity("CheckerApi.Data.Entities.ApiConfiguration", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
@@ -38,7 +36,7 @@ namespace CheckerApi.Migrations
                     b.ToTable("Configurations");
                 });
 
-            modelBuilder.Entity("CheckerApi.DTO.DataDB", b =>
+            modelBuilder.Entity("CheckerApi.Data.Entities.BidEntry", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
