@@ -51,13 +51,14 @@ namespace CheckerApi.Services
         public IEnumerable<AlertDTO> SignOfAttack(IEnumerable<BidEntry> orders, ApiConfiguration config)
         {
             var foundOrders = new List<AlertDTO>();
-            var highestOrder = orders.Where(o => o.Alive).OrderByDescending(o => o.Price).FirstOrDefault();
+            var aliveOrders = orders.Where(o => o.Alive).ToList();
+            var highestOrder = aliveOrders.OrderByDescending(o => o.Price).FirstOrDefault();
             if (highestOrder == null)
             {
                 return foundOrders;
             }
 
-            foreach (var order in orders)
+            foreach (var order in aliveOrders)
             {
                 if (order.Price + config.PriceThreshold >= highestOrder.Price &&
                     (order.LimitSpeed == 0 || order.LimitSpeed >= config.LimitSpeed)
@@ -89,7 +90,7 @@ namespace CheckerApi.Services
                 }
             }
             
-            
+
             return foundOrders;
         }
 
