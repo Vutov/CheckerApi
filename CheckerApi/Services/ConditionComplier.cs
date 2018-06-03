@@ -51,41 +51,44 @@ namespace CheckerApi.Services
         public IEnumerable<AlertDTO> SignOfAttack(IEnumerable<BidEntry> orders, ApiConfiguration config)
         {
             var foundOrders = new List<AlertDTO>();
-            var top2 = orders.Where(o => o.Alive).OrderByDescending(o => o.Price).Take(2).ToList();
-            if (top2.Count < 2)
+            var highestOrder = orders.Where(o => o.Alive).OrderByDescending(o => o.Price).FirstOrDefault();
+            if (highestOrder == null)
             {
                 return foundOrders;
             }
-            
-            if (top2[0].Price - config.PriceThreshold >= top2[1].Price &&
-               (top2[0].LimitSpeed == 0 || top2[0].LimitSpeed >= config.LimitSpeed)
-            )
+
+            foreach (var order in orders)
             {
-                var sig = this.CreateSignSignature(top2[0]);
-                string conditon = string.Empty;
-                string message = string.Empty;
-                var order = top2[0];
-
-                if (!BidsTrack.Contains(sig))
+                if (order.Price + config.PriceThreshold >= highestOrder.Price &&
+                    (order.LimitSpeed == 0 || order.LimitSpeed >= config.LimitSpeed)
+                )
                 {
-                    HandleQueue(sig, BidsTrack);
+                    var sig = this.CreateSignSignature(order);
+                    string conditon = string.Empty;
+                    string message = string.Empty;
 
-                    conditon = $"Condition: Order Alive ({top2[0].Alive}) AND Order Price ({top2[0].Price}) - '{config.PriceThreshold}' >= Second Order Price ({top2[1].Price}, ID: {top2[1].NiceHashId}) AND Order Speed Limit ({top2[0].LimitSpeed}) = 0 OR Order Speed Limit ({top2[0].LimitSpeed}) >= '{config.LimitSpeed}'. ";
-                    message = $"SUSPICIOUS BID ALERT - an attack may be about to begin. {this.CreateMessage(top2[0])}. ";
+                    if (!BidsTrack.Contains(sig))
+                    {
+                        HandleQueue(sig, BidsTrack);
+
+                        conditon = $"Condition: Order Alive ({order.Alive}) AND Order Price ({order.Price}) withing '{config.PriceThreshold}' top Order Price ({highestOrder.Price}, ID: {highestOrder.NiceHashId}) AND Order Speed Limit ({order.LimitSpeed}) = 0 OR Order Speed Limit ({order.LimitSpeed}) >= '{config.LimitSpeed}'. ";
+                        message = $"SUSPICIOUS BID ALERT - an attack may be about to begin. {this.CreateMessage(order)}. ";
+                    }
+                    else
+                    {
+                        message = $"SUSPICIOUS BID Progress - {order.AcceptedSpeed * 1000} MSol DELIVERED, ID {order.NiceHashId} AT {_locationDict[order.NiceHashDataCenter]} SERVER. ";
+                    }
+
+                    foundOrders.Add(new AlertDTO()
+                    {
+                        BidEntry = order,
+                        Condition = conditon,
+                        Message = message
+                    });
+
                 }
-                else
-                {
-                    message = $"SUSPICIOUS BID Progress - {order.AcceptedSpeed * 1000} MSol DELIVERED, ID {order.NiceHashId} AT {_locationDict[order.NiceHashDataCenter]} SERVER. ";
-                }
-
-                foundOrders.Add(new AlertDTO()
-                {
-                    BidEntry = top2[0],
-                    Condition = conditon,
-                    Message = message
-                });
-
             }
+            
             
             return foundOrders;
         }
@@ -101,7 +104,7 @@ namespace CheckerApi.Services
 
         private string CreateSignSignature(BidEntry entry)
         {
-            return $"{entry.ID}{entry.NiceHashDataCenter}";
+            return $"{entry.NiceHashId}{entry.NiceHashDataCenter}";
         }
 
         private string CreateMessage(BidEntry order)

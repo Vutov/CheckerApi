@@ -148,7 +148,8 @@ namespace CheckerApi.UnitTests.Services
                 {
                     Price = 1,
                     Alive = true,
-                    AcceptedSpeed = 1
+                    AcceptedSpeed = 1,
+                    LimitSpeed = 4
                 },
                 new BidEntry()
                 {
@@ -182,7 +183,8 @@ namespace CheckerApi.UnitTests.Services
                     NiceHashId = "15",
                     Price = 1,
                     Alive = true,
-                    AcceptedSpeed = 1
+                    AcceptedSpeed = 1,
+                    LimitSpeed = 1
                 },
                 new BidEntry()
                 {
@@ -245,6 +247,42 @@ namespace CheckerApi.UnitTests.Services
             Assert.IsTrue(data1.First().Message.Contains("Progress"));
         }
 
+        [Test]
+        public void SignOfAttack_ShouldReturnBids_WhenWithinThreashold()
+        {
+            // Arrange
+            var complier = new ConditionComplier();
+            var orders = new List<BidEntry>()
+            {
+                new BidEntry()
+                {
+                    NiceHashId = "21",
+                    Price = 21.5,
+                    Alive = true,
+                    AcceptedSpeed = 1
+                },
+                new BidEntry()
+                {
+                    NiceHashId = "20",
+                    Price = 22,
+                    Alive = true,
+                    LimitSpeed = 10
+                }
+            };
+            var config = new ApiConfiguration()
+            {
+                PriceThreshold = 1,
+                LimitSpeed = 11
+            };
+
+            // Act
+            var data = complier.SignOfAttack(orders, config);
+
+            // Assert
+            Assert.AreEqual(1, data.Count());
+            Assert.AreEqual("21", data.First().BidEntry.NiceHashId);
+        }
+
         private IEnumerable<BidEntry> GetLargeBidSet(int id)
         {
             var data = new Dictionary<int, IEnumerable<BidEntry>>()
@@ -293,14 +331,7 @@ namespace CheckerApi.UnitTests.Services
                         {
                             NiceHashId = "1",
                             Alive = true,
-                            LimitSpeed = 0,
-                            Price = 12
-                        },
-                        new BidEntry()
-                        {
-                            NiceHashId = "2",
-                            Alive = true,
-                            LimitSpeed = 0,
+                            LimitSpeed = 5,
                             Price = 12
                         }
                     }
@@ -310,14 +341,14 @@ namespace CheckerApi.UnitTests.Services
                     {
                         new BidEntry()
                         {
-                            NiceHashId = "1",
+                            NiceHashId = "3",
                             Alive = true,
-                            LimitSpeed = 0,
-                            Price = 1
+                            LimitSpeed = 5,
+                            Price = 5
                         },
                         new BidEntry()
                         {
-                            NiceHashId = "1",
+                            NiceHashId = "4",
                             Alive = true,
                             LimitSpeed = 0,
                             Price = 1.1

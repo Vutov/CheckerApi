@@ -30,7 +30,7 @@ namespace CheckerApi
             {
                 while (true)
                 {
-                    Task.Delay(TimeSpan.FromSeconds(15)).Wait();
+                    Task.Delay(TimeSpan.FromSeconds(30)).Wait();
                     using (var serviceScope = host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
                     {
                         var syncService = serviceScope.ServiceProvider.GetRequiredService<ISyncService>();

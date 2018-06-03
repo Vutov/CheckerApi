@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using CheckerApi.Context;
 using CheckerApi.Services.Interfaces;
@@ -137,11 +138,15 @@ namespace CheckerApi.Controllers
         {
             var env = _serviceProvider.GetService<IHostingEnvironment>();
             var build = System.IO.File.ReadAllText("./version.txt");
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+
             return Ok(new
             {
                 BuildDate = build,
                 Environment = env.EnvironmentName,
-                Name = env.ApplicationName
+                Name = env.ApplicationName,
+                Version = fvi.FileVersion
             });
         }
     }
