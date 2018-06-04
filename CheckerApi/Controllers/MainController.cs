@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using CheckerApi.Context;
+using CheckerApi.Data.Entities;
 using CheckerApi.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.IO;
 
 namespace CheckerApi.Controllers
 {
@@ -37,28 +39,35 @@ namespace CheckerApi.Controllers
         [Route("")]
         public IActionResult Status()
         {
-            var config = _context.Configurations.OrderBy(o => o.ID).First();
+            var (_, settings) = this.GetConfig();
+            var conditions = _context.ConditionSettings
+                .OrderBy(o => o.ID)
+                .Select(c => new { Name = c.ConditionName, c.Enabled })
+                .ToList();
+
             return Ok(new
             {
                 Status = "Running",
                 FoundOrders = _context.Data.Count(),
-                Commands = new[] {
-                        $"/acceptedspeed ({config.AcceptedSpeed})",
-                        $"/limitspeed ({config.LimitSpeed})",
-                        $"/pricethreshold ({config.PriceThreshold})",
-                        "/data",
-                        "/data/100"}
+                Settings = settings.Select(s => s.Name),
+                Conditions = conditions
             });
         }
 
         [HttpGet]
-        [Route("acceptedspeed/{rate}/{password?}")]
-        public IActionResult SetAcceptedSpeed(double rate, string password = "")
+        [Route("{setting}/{rate}/{password?}")]
+        public IActionResult SetSetting(string setting, double rate, string password = "")
         {
-            if (_password != password)
+            if (_password != password || string.IsNullOrEmpty(setting))
                 return NotFound();
 
-            var config = _context.Configurations.OrderBy(o => o.ID).First();
+            var (config, settings) = this.GetConfig();
+
+            var settingProp = settings.FirstOrDefault(s => s.Name.ToLower() == setting.ToLower());
+            if (settingProp == null)
+                return NotFound();
+
+            settingProp.SetValue(config, rate, null);
             config.AcceptedSpeed = rate;
             _context.Update(config);
             _context.SaveChanges();
@@ -67,54 +76,21 @@ namespace CheckerApi.Controllers
         }
 
         [HttpGet]
-        [Route("acceptedspeed")]
-        public IActionResult GetAcceptedSpeed(double rate)
+        [Route("Condition/{condition}/{enabled}/{password?}")]
+        public IActionResult SetSetting(string condition, bool enabled, string password = "")
         {
-            return Ok(_context.Configurations.OrderBy(o => o.ID).First().AcceptedSpeed);
-        }
-
-        [HttpGet]
-        [Route("limitspeed/{rate}/{password?}")]
-        public IActionResult SetLimitSpeed(double rate, string password = "")
-        {
-            if (_password != password)
+            if (_password != password || string.IsNullOrEmpty(condition))
                 return NotFound();
 
-            var config = _context.Configurations.OrderBy(o => o.ID).First();
-            config.LimitSpeed = rate;
-            _context.Update(config);
-            _context.SaveChanges();
-
-            return Ok(rate);
-        }
-
-        [HttpGet]
-        [Route("limitspeed")]
-        public IActionResult GetLimitSpeed(double rate)
-        {
-            return Ok(_context.Configurations.OrderBy(o => o.ID).First().LimitSpeed);
-        }
-
-        [HttpGet]
-        [Route("pricethreshold/{rate}/{password?}")]
-        public IActionResult SetPriceThreshold(double rate, string password = "")
-        {
-            if (_password != password)
+            var conditionEntry = _context.ConditionSettings.FirstOrDefault(c => c.ConditionName == condition);
+            if (conditionEntry == null)
                 return NotFound();
 
-            var config = _context.Configurations.OrderBy(o => o.ID).First();
-            config.PriceThreshold = rate;
-            _context.Update(config);
+            conditionEntry.Enabled = enabled;
+            _context.Update(conditionEntry);
             _context.SaveChanges();
 
-            return Ok(rate);
-        }
-
-        [HttpGet]
-        [Route("pricethreshold")]
-        public IActionResult GetPriceThreshold(double rate)
-        {
-            return Ok(_context.Configurations.OrderBy(o => o.ID).First().PriceThreshold);
+            return Ok(enabled);
         }
 
         [HttpGet]
@@ -148,6 +124,18 @@ namespace CheckerApi.Controllers
                 Name = env.ApplicationName,
                 Version = fvi.FileVersion
             });
+        }
+
+        private (ApiConfiguration config, List<PropertyInfo> configProps) GetConfig()
+        {
+            var config = _context.Configurations.OrderBy(o => o.ID).First();
+            var type = config.GetType();
+            var settings = type
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                .ToList();
+            settings.RemoveAll(p => p.Name.ToLower() == "id");
+
+            return (config, settings);
         }
     }
 }

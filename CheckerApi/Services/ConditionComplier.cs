@@ -20,7 +20,8 @@ namespace CheckerApi.Services
 
         public static Queue<string> DataHashes = new Queue<string>();
         public static Queue<string> BidsTrack = new Queue<string>();
-        
+        public static Queue<string> PercentageTrack = new Queue<string>();
+
         public IEnumerable<AlertDTO> AcceptedSpeedCondition(IEnumerable<BidEntry> orders, ApiConfiguration config)
         {
             var foundOrders = new List<AlertDTO>();
@@ -47,7 +48,7 @@ namespace CheckerApi.Services
 
             return foundOrders;
         }
-        
+
         public IEnumerable<AlertDTO> SignOfAttack(IEnumerable<BidEntry> orders, ApiConfiguration config)
         {
             var foundOrders = new List<AlertDTO>();
@@ -61,8 +62,9 @@ namespace CheckerApi.Services
             foreach (var order in aliveOrders)
             {
                 if (order.Price + config.PriceThreshold >= highestOrder.Price &&
-                    (order.LimitSpeed == 0 || order.LimitSpeed >= config.LimitSpeed)
-                )
+                    (order.LimitSpeed == 0 || order.LimitSpeed >= config.LimitSpeed) &&
+                    order.AcceptedSpeed >= config.MinimalAcceptedSpeed
+                ) // todo add min accepted speed test
                 {
                     var sig = this.CreateSignSignature(order);
                     string conditon = string.Empty;
@@ -72,6 +74,7 @@ namespace CheckerApi.Services
                     {
                         HandleQueue(sig, BidsTrack);
 
+                        // todo add min accepted speed to condition
                         conditon = $"Condition: Order Alive ({order.Alive}) AND Order Price ({order.Price}) withing '{config.PriceThreshold}' top Order Price ({highestOrder.Price}, ID: {highestOrder.NiceHashId}) AND Order Speed Limit ({order.LimitSpeed}) = 0 OR Order Speed Limit ({order.LimitSpeed}) >= '{config.LimitSpeed}'. ";
                         message = $"SUSPICIOUS BID ALERT - an attack may be about to begin. {this.CreateMessage(order)}. ";
                     }
@@ -89,7 +92,71 @@ namespace CheckerApi.Services
 
                 }
             }
-            
+
+            return foundOrders;
+        }
+
+        // TODO Unhardcode 10%
+        public IEnumerable<AlertDTO> PercentThresholdAttack(IEnumerable<BidEntry> orders, ApiConfiguration config)
+        {
+            var foundOrders = new List<AlertDTO>();
+            var aliveOrders = orders.Where(o => o.Alive).ToList();
+            // todo sum acceptedSpeed of active?
+            var percentThreshold = aliveOrders.Sum(o => o.AcceptedSpeed) * 0.1d;
+            var orderedOrders = aliveOrders.OrderByDescending(o => o.Price);
+            var currentAcceptedSpeed = 0d;
+
+            BidEntry benchmarkOrder = null;
+            foreach (var order in orderedOrders)
+            {
+                if (currentAcceptedSpeed + order.AcceptedSpeed >= percentThreshold)
+                {
+                    benchmarkOrder = order;
+                    break;
+                }
+
+                currentAcceptedSpeed += order.AcceptedSpeed;
+            }
+
+            if (benchmarkOrder == null)
+            {
+                return foundOrders;
+            }
+
+            // PercentThresholdAttack is enchancment on top of SignOfAttack
+            // Avoid double alerts
+            var notReported = aliveOrders.Where(o => !BidsTrack.Contains(this.CreateSignSignature(o))).ToList();
+            foreach (var order in notReported)
+            {
+                if (order.Price >= benchmarkOrder.Price &&
+                   (order.LimitSpeed == 0 || order.LimitSpeed >= config.LimitSpeed) &&
+                    order.AcceptedSpeed >= config.MinimalAcceptedSpeed
+                ) // todo add min accepted speed test
+                {
+                    var sig = this.CreateSignSignature(order);
+                    string conditon = string.Empty;
+                    string message = string.Empty;
+
+                    if (!PercentageTrack.Contains(sig))
+                    {
+                        HandleQueue(sig, PercentageTrack);
+                        // todo add min accepted speed to condition
+                        conditon = $"Condition: Order Alive ({order.Alive}) AND Order Price ({order.Price}) above '{benchmarkOrder.Price}' benchmark Order Price (ID: {benchmarkOrder.NiceHashId}) AND Order Speed Limit ({order.LimitSpeed}) = 0 OR Order Speed Limit ({order.LimitSpeed}) >= '{config.LimitSpeed}'. ";
+                        message = $"SUSPICIOUS BID Percentage ALERT - an attack may be about to begin. {this.CreateMessage(order)}. ";
+                    }
+                    else
+                    {
+                        message = $"SUSPICIOUS BID Progress - {order.AcceptedSpeed * 1000} MSol DELIVERED, ID {order.NiceHashId} AT {_locationDict[order.NiceHashDataCenter]} SERVER. ";
+                    }
+
+                    foundOrders.Add(new AlertDTO()
+                    {
+                        BidEntry = order,
+                        Condition = conditon,
+                        Message = message
+                    });
+                }
+            }
 
             return foundOrders;
         }

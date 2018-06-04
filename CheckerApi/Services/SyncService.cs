@@ -66,6 +66,10 @@ namespace CheckerApi.Services
                     foundSignBids.ForEach(b => this.TriggerHook(b.Condition, b.Message));
                     foundOrders.AddRange(foundSignBids.Select(b => b.BidEntry));
 
+                    var foundPercentBids = _condition.PercentThresholdAttack(orders, config).ToList();
+                    foundPercentBids.ForEach(b => this.TriggerHook(b.Condition, b.Message));
+                    foundOrders.AddRange(foundPercentBids.Select(b => b.BidEntry));
+
                     if (foundOrders.Any())
                     {
                         _context.Data.AddRange(foundOrders);

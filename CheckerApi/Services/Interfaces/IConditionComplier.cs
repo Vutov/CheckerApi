@@ -8,5 +8,6 @@ namespace CheckerApi.Services.Interfaces
     {
         IEnumerable<AlertDTO> AcceptedSpeedCondition(IEnumerable<BidEntry> orders, ApiConfiguration config);
         IEnumerable<AlertDTO> SignOfAttack(IEnumerable<BidEntry> orders, ApiConfiguration config);
+        IEnumerable<AlertDTO> PercentThresholdAttack(IEnumerable<BidEntry> orders, ApiConfiguration config);
     }
 }
