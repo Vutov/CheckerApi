@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CheckerApi.Data.Entities
+namespace CheckerApi.Models.Entities
 {
     [Table("ConditionSettings")]
     public class ConditionSetting

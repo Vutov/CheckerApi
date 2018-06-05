@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using CheckerApi.Context;
-using CheckerApi.Data.DTO;
-using CheckerApi.Data.Entities;
+using CheckerApi.Models.DTO;
+using CheckerApi.Models.Entities;
 using CheckerApi.Services.Interfaces;
 
 namespace CheckerApi.Services

@@ -2,8 +2,8 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
-using CheckerApi.Data.DTO;
-using CheckerApi.Data.Entities;
+using CheckerApi.Models.DTO;
+using CheckerApi.Models.Entities;
 using CheckerApi.Services.Interfaces;
 
 namespace CheckerApi.Services.Conditions

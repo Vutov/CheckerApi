@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using CheckerApi.Data.DTO;
-using CheckerApi.Data.Entities;
 using CheckerApi.Extensions;
+using CheckerApi.Models.DTO;
+using CheckerApi.Models.Entities;
 using Newtonsoft.Json;
 
 namespace CheckerApi.Services.Conditions
@@ -28,7 +28,9 @@ namespace CheckerApi.Services.Conditions
                     foundOrders.Add(new AlertDTO()
                     {
                         BidEntry = order,
-                        Condition = $"Condition: Order Alive ({order.Alive}) AND Order Accepted Speed ({order.AcceptedSpeed}) >= '{config.AcceptedSpeed}'. ",
+                        Condition = $"Condition: " +
+                                    $"Order Alive ({order.Alive}) AND " +
+                                    $"Order Accepted Speed ({order.AcceptedSpeed}) >= '{config.AcceptedSpeed}'. ",
                         Message = $"LARGE ORDER ALERT - possible attack in progress. {CreateMessage(order)}. "
                     });
                 }

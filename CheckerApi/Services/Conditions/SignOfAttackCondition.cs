@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CheckerApi.Data.DTO;
-using CheckerApi.Data.Entities;
 using CheckerApi.Extensions;
+using CheckerApi.Models.DTO;
+using CheckerApi.Models.Entities;
 
 namespace CheckerApi.Services.Conditions
 {

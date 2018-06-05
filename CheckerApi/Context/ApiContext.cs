@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CheckerApi.Data;
-using CheckerApi.Data.Entities;
+using CheckerApi.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CheckerApi.Context
@@ -16,6 +15,9 @@ namespace CheckerApi.Context
         public DbSet<BidEntry> Data { get; set; }
         public DbSet<ApiConfiguration> Configurations { get; set; }
         public DbSet<ConditionSetting> ConditionSettings { get; set; }
+        public DbSet<BidAudit> OrdersAudit { get; set; }
+
+        public ApiConfiguration Configuration => Configurations.FirstOrDefault();
 
         public void Seed()
         {
@@ -30,7 +32,8 @@ namespace CheckerApi.Context
                         PriceThreshold = 0.04,
                         LastNotification = DateTime.UtcNow.AddMinutes(-15),
                         MinimalAcceptedSpeed = 0.003,
-                        AcceptedPercentThreshold = 0.1
+                        AcceptedPercentThreshold = 0.1,
+                        EnableAudit = true
                     }
                 };
 

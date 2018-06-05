@@ -1,9 +1,9 @@
 ﻿using System;
 using AutoMapper;
-using CheckerApi.Data.Entities;
-using CheckerApi.DTO;
+using CheckerApi.Models.DTO;
+using CheckerApi.Models.Entities;
 
-namespace CheckerApi
+namespace CheckerApi.AutoMapper
 {
     public class ApiProfile : Profile
     {
@@ -16,6 +16,9 @@ namespace CheckerApi
                     opts => opts.MapFrom(src => src.Id))
                 .ForMember(dest => dest.RecordDate,
                     opts => opts.MapFrom(src => DateTime.UtcNow))
+                ;
+
+            CreateMap<BidEntry, BidAudit>()
                 ;
         }
     }

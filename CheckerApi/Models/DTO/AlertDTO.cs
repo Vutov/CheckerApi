@@ -1,6 +1,6 @@
-﻿using CheckerApi.Data.Entities;
+﻿using CheckerApi.Models.Entities;
 
-namespace CheckerApi.Data.DTO
+namespace CheckerApi.Models.DTO
 {
     public class AlertDTO
     {

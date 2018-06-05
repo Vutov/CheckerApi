@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using CheckerApi.Context;
-using CheckerApi.Data;
-using CheckerApi.Data.Entities;
-using CheckerApi.DTO;
+using CheckerApi.Models;
+using CheckerApi.Models.DTO;
+using CheckerApi.Models.Entities;
 using CheckerApi.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -23,6 +21,7 @@ namespace CheckerApi.Services
         private readonly ApiContext _context;
         private readonly INotificationManager _notification;
         private readonly IConditionComplier _condition;
+        private readonly IAuditManager _audit;
 
         private readonly int[] _locations = { 0, 1 };
         private readonly int _alertInterval;
@@ -35,6 +34,7 @@ namespace CheckerApi.Services
             _notification = serviceProvider.GetService<INotificationManager>();
             _condition = serviceProvider.GetService<IConditionComplier>();
             _context = serviceProvider.GetService<ApiContext>();
+            _audit = serviceProvider.GetService<IAuditManager>();
 
             var config = serviceProvider.GetService<IConfiguration>();
             _alertInterval = config.GetValue<int>("Api:Alert:IntervalMin");
@@ -47,7 +47,7 @@ namespace CheckerApi.Services
             
             try
             {
-                var config = _context.Configurations.OrderBy(o => o.ID).First();
+                var config = _context.Configuration;
                 var settings = _context.ConditionSettings.ToList();
 
                 foreach (var location in _locations)
@@ -56,16 +56,19 @@ namespace CheckerApi.Services
                     var request = new RestRequest($"api?method=orders.get&location={location}&algo=24", Method.GET);
                     var response = client.Execute(request);
                     var data = JsonConvert.DeserializeObject<ResultDTO>(response.Content);
-
                     var orders = data.Result.Orders.Select(o => CreateDTO(o, location)).ToList();
+
+                    var auditJob = _audit.CreateAudit(orders);
+
                     var foundOrders = _condition.Check(orders, config, settings).ToList();
                     foundOrders.ForEach(b => TriggerHook(b.Condition, b.Message));
-
                     if (foundOrders.Any())
                     {
                         _context.Data.AddRange(foundOrders.Select(b => b.BidEntry));
                         _context.SaveChanges();
                     }
+
+                    auditJob.Wait(TimeSpan.FromSeconds(5));
                 }
 
                 _logger.LogInformation("Sync Finished");
@@ -89,7 +92,7 @@ namespace CheckerApi.Services
         private void TriggerHook(string condition, string message)
         {
             var alert = string.Empty;
-            var config = _context.Configurations.OrderBy(o => o.ID).First();
+            var config = _context.Configuration;
             if (DateTime.UtcNow.AddMinutes(-_alertInterval) >= config.LastNotification)
             {
                 alert = _alertMessage;

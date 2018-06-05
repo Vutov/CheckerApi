@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CheckerApi.Data.Entities
+namespace CheckerApi.Models.Entities
 {
     [Table("Configurations")]
     public class ApiConfiguration
@@ -13,5 +13,6 @@ namespace CheckerApi.Data.Entities
         public DateTime LastNotification { get; set; }
         public double MinimalAcceptedSpeed { get; set; }
         public double AcceptedPercentThreshold { get; set; }
+        public bool EnableAudit { get; set; }
     }
 }

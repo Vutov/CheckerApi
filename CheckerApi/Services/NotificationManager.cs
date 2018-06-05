@@ -1,5 +1,5 @@
 ﻿using System;
-using CheckerApi.Data;
+using CheckerApi.Models;
 using CheckerApi.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

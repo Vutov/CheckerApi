@@ -1,4 +1,4 @@
-﻿namespace CheckerApi.Data
+﻿namespace CheckerApi.Models
 {
     public class EndpointConfiguration
     {

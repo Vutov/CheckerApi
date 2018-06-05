@@ -1,10 +1,8 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CheckerApi.Data.Entities
+namespace CheckerApi.Models.Entities
 {
-    [Table("Data")]
-    public class BidEntry
+    public class BaseBid
     {
         public int ID { get; set; }
         public DateTime RecordDate { get; set; }

@@ -1,4 +1,4 @@
-﻿using CheckerApi.Data;
+﻿using CheckerApi.Models;
 
 namespace CheckerApi.Services.Interfaces
 {

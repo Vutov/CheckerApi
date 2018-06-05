@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CheckerApi.Data
+namespace CheckerApi.Models
 {
     public class Result
     {

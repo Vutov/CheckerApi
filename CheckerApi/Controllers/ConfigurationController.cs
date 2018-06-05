@@ -15,8 +15,8 @@ namespace CheckerApi.Controllers
         }
 
         [HttpGet]
-        [Route("{setting}/{rate}/{password?}")]
-        public IActionResult SetSetting(string setting, double rate, string password = "")
+        [Route("{setting}/{value}/{password?}")]
+        public IActionResult SetSetting(string setting, string value, string password = "")
         {
             if (Password != password || string.IsNullOrEmpty(setting))
                 return NotFound();
@@ -27,16 +27,16 @@ namespace CheckerApi.Controllers
             if (settingProp == null)
                 return NotFound();
 
-            settingProp.SetValue(config, rate, null);
-            config.AcceptedSpeed = rate;
+            var settingValue = Convert.ChangeType(value, settingProp.PropertyType);
+            settingProp.SetValue(config, settingValue, null);
             Context.Update(config);
             Context.SaveChanges();
 
-            return Ok(rate);
+            return Ok(value);
         }
 
         [HttpGet]
-        [Route("Condition/{condition}/{enabled}/{password?}")]
+        [Route("condition/{condition}/{enabled}/{password?}")]
         public IActionResult SetSetting(string condition, bool enabled, string password = "")
         {
             if (Password != password || string.IsNullOrEmpty(condition))
@@ -69,7 +69,7 @@ namespace CheckerApi.Controllers
         }
 
         [HttpGet]
-        [Route("clearConditionsCache/{password?}")]
+        [Route("clearconditions/{password?}")]
         public IActionResult ClearConditionsCache(string password = "")
         {
             if (Password != password)

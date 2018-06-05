@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace CheckerApi.DTO
+namespace CheckerApi.Models.DTO
 {
     class ResultDTO
     {

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CheckerApi.Data.DTO;
-using CheckerApi.Data.Entities;
 using CheckerApi.Extensions;
+using CheckerApi.Models.DTO;
+using CheckerApi.Models.Entities;
 
 namespace CheckerApi.Services.Conditions
 {
@@ -14,7 +14,6 @@ namespace CheckerApi.Services.Conditions
         {
             var foundOrders = new List<AlertDTO>();
             var aliveOrders = orders.Where(o => o.Alive).ToList();
-            // todo sum acceptedSpeed of active?
             var threshold = aliveOrders.Sum(o => o.AcceptedSpeed) * config.AcceptedPercentThreshold;
             var orderedOrders = aliveOrders.OrderByDescending(o => o.Price);
             var currentAcceptedSpeed = 0d;

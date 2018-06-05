@@ -15,14 +15,7 @@ namespace CheckerApi.Controllers
         {
             
         }
-
-        [HttpGet]
-        [Route("data/{top?}")]
-        public IActionResult Get(int top = 10)
-        {
-            return Ok(Context.Data.OrderByDescending(i => i.RecordDate).Take(top).ToList());
-        }
-
+        
         [HttpGet]
         [Route("")]
         public IActionResult Status()

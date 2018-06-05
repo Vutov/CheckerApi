@@ -48,12 +48,16 @@ namespace CheckerApi
                 .UseStartup<Startup>()
                 .UseSerilog((hostingContext, loggerConfiguration) =>
                 {
+                    var logLevel = hostingContext.HostingEnvironment.IsDevelopment()
+                        ? LogEventLevel.Verbose
+                        : LogEventLevel.Error;
+
                     loggerConfiguration
                         .MinimumLevel.Verbose()
                         .Enrich.FromLogContext()
                         .Enrich.WithProperty("Environment", hostingContext.HostingEnvironment)
                         .Enrich.WithProperty("HostName", Environment.MachineName)
-                        .WriteTo.Console(theme: SystemConsoleTheme.Literate)
+                        .WriteTo.Console(theme: SystemConsoleTheme.Literate, restrictedToMinimumLevel: logLevel)
                         .WriteTo.File("./errorlogs.txt", LogEventLevel.Error);
 
                     SelfLog.Enable(Console.Error);

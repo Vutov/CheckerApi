@@ -36,6 +36,7 @@ namespace CheckerApi
             services.AddTransient<INotificationManager, NotificationManager>();
             services.AddTransient<IConditionComplier, ConditionComplier>();
             services.AddTransient<IRestClient, RestClient>();
+            services.AddTransient<IAuditManager, AuditManager>();
 
             services.AddMvc();
         }
