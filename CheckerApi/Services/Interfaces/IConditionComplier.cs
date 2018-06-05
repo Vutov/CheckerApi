@@ -6,8 +6,6 @@ namespace CheckerApi.Services.Interfaces
 {
     public interface IConditionComplier
     {
-        IEnumerable<AlertDTO> AcceptedSpeedCondition(IEnumerable<BidEntry> orders, ApiConfiguration config);
-        IEnumerable<AlertDTO> SignOfAttack(IEnumerable<BidEntry> orders, ApiConfiguration config);
-        IEnumerable<AlertDTO> PercentThresholdAttack(IEnumerable<BidEntry> orders, ApiConfiguration config);
+        IEnumerable<AlertDTO> Check(IEnumerable<BidEntry> orders, ApiConfiguration config, IEnumerable<ConditionSetting> settings);
     }
 }

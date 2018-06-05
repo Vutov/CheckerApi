@@ -48,6 +48,8 @@ namespace CheckerApi.Services
             try
             {
                 var config = _context.Configurations.OrderBy(o => o.ID).First();
+                var settings = _context.ConditionSettings.ToList();
+
                 foreach (var location in _locations)
                 {
                     var client = new RestClient("https://api.nicehash.com/");
@@ -56,23 +58,12 @@ namespace CheckerApi.Services
                     var data = JsonConvert.DeserializeObject<ResultDTO>(response.Content);
 
                     var orders = data.Result.Orders.Select(o => CreateDTO(o, location)).ToList();
-                    var foundOrders = new List<BidEntry>();
-
-                    var foundSpeedBids = _condition.AcceptedSpeedCondition(orders, config).ToList();
-                    foundSpeedBids.ForEach(b => this.TriggerHook(b.Condition, b.Message));
-                    foundOrders.AddRange(foundSpeedBids.Select(b => b.BidEntry));
-                   
-                    var foundSignBids = _condition.SignOfAttack(orders, config).ToList();
-                    foundSignBids.ForEach(b => this.TriggerHook(b.Condition, b.Message));
-                    foundOrders.AddRange(foundSignBids.Select(b => b.BidEntry));
-
-                    var foundPercentBids = _condition.PercentThresholdAttack(orders, config).ToList();
-                    foundPercentBids.ForEach(b => this.TriggerHook(b.Condition, b.Message));
-                    foundOrders.AddRange(foundPercentBids.Select(b => b.BidEntry));
+                    var foundOrders = _condition.Check(orders, config, settings).ToList();
+                    foundOrders.ForEach(b => TriggerHook(b.Condition, b.Message));
 
                     if (foundOrders.Any())
                     {
-                        _context.Data.AddRange(foundOrders);
+                        _context.Data.AddRange(foundOrders.Select(b => b.BidEntry));
                         _context.SaveChanges();
                     }
                 }

@@ -19,7 +19,7 @@ namespace CheckerApi.Context
 
         public void Seed()
         {
-            if (!this.Configurations.Any())
+            if (!Configurations.Any())
             {
                 var config = new List<ApiConfiguration>
                 {
@@ -29,27 +29,31 @@ namespace CheckerApi.Context
                         LimitSpeed = 11,
                         PriceThreshold = 0.04,
                         LastNotification = DateTime.UtcNow.AddMinutes(-15),
-                        MinimalAcceptedSpeed = 0.003
+                        MinimalAcceptedSpeed = 0.003,
+                        AcceptedPercentThreshold = 0.1
                     }
                 };
 
-                this.AddRange(config);
-
-                var settings = new List<ConditionSetting>();
-                foreach (ConditionNames name in Enum.GetValues(typeof(ConditionNames)))
-                {
-                    settings.Add(new ConditionSetting()
-                    {
-                        ConditionID = (int)name,
-                        ConditionName = Enum.GetName(typeof(ConditionNames), (int)name),
-                        Enabled = true
-                    });
-                }
-
-                this.AddRange(settings);
-                
-                this.SaveChanges();
+                AddRange(config);
             }
+
+            foreach (var condition in Registry.Conditions)
+            {
+                var name = condition.Value.Name;
+                if (ConditionSettings.FirstOrDefault(c => c.ConditionName == name) == null)
+                {
+                    var setting = new ConditionSetting()
+                    {
+                        ConditionID = condition.Key,
+                        ConditionName = name,
+                        Enabled = true
+                    };
+
+                    Add(setting);
+                }
+            }
+            
+            SaveChanges();
         }
     }
 }

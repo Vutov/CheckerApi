@@ -6,9 +6,9 @@ namespace CheckerApi.Data
     {
         protected Result(bool status, params string[] messages)
         {
-            this.Status = status;
-            this.Messages = new List<string>();
-            this.Messages.AddRange(messages);
+            Status = status;
+            Messages = new List<string>();
+            Messages.AddRange(messages);
         }
 
         public List<string> Messages { get; }
@@ -17,12 +17,12 @@ namespace CheckerApi.Data
         
         public bool IsSuccess()
         {
-            return this.Status == true;
+            return Status == true;
         }
 
         public bool HasFailed()
         {
-            return this.Status == false;
+            return Status == false;
         }
 
         public static Result Ok(params string[] messages)
@@ -40,7 +40,7 @@ namespace CheckerApi.Data
     {
         protected Result(T value, bool status, params string[] messages) : base(status, messages)
         {
-            this.Value = value;
+            Value = value;
         }
 
         public T Value { get; }

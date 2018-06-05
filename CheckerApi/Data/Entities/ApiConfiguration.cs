@@ -12,5 +12,6 @@ namespace CheckerApi.Data.Entities
         public double PriceThreshold { get; set; }
         public DateTime LastNotification { get; set; }
         public double MinimalAcceptedSpeed { get; set; }
+        public double AcceptedPercentThreshold { get; set; }
     }
 }
