@@ -53,7 +53,7 @@ namespace CheckerApi.Services.Conditions
                         conditon = $"Condition: " +
                                    $"Order Alive ({order.Alive}) AND " +
                                    $"Order Price ({order.Price}) above '{benchmarkOrder.Price}' benchmark Order Price (ID: {benchmarkOrder.NiceHashId}) AND " +
-                                   $"(Order Speed Limit ({order.LimitSpeed}) = 0 OR Order Speed Limit ({order.LimitSpeed}) >= '{config.LimitSpeed}') AND" +
+                                   $"(Order Speed Limit ({order.LimitSpeed}) = 0 OR Order Speed Limit ({order.LimitSpeed}) >= '{config.LimitSpeed}') AND " +
                                    $"Order Accepted Speed ({order.AcceptedSpeed}) >= {config.MinimalAcceptedSpeed}. ";
                         message = $"SUSPICIOUS BID Percentage ALERT - an attack may be about to begin. {CreateMessage(order)}. ";
                     }

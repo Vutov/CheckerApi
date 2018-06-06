@@ -13,7 +13,8 @@ namespace CheckerApi.Services
         public IEnumerable<AlertDTO> Check(IEnumerable<BidEntry> orders, ApiConfiguration config, IEnumerable<ConditionSetting> settings)
         {
             var foundOrders = new List<AlertDTO>();
-            foreach (var conditionEntry in Registry.Conditions)
+            var conditions = Registry.Conditions.OrderBy(c => c.Key).ToList();
+            foreach (var conditionEntry in conditions)
             {
                 var setting = settings.FirstOrDefault(s => s.ConditionID == conditionEntry.Key);
                 if (setting != null && setting.Enabled)

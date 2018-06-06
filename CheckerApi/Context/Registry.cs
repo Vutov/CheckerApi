@@ -6,7 +6,7 @@ namespace CheckerApi.Context
 {
     public static class Registry
     {
-        public static readonly SortedDictionary<int, Type> Conditions = new SortedDictionary<int, Type>()
+        public static readonly Dictionary<int, Type> Conditions = new Dictionary<int, Type>()
         {
             {10, typeof(AcceptedSpeedCondition) },
             {20, typeof(SignOfAttackCondition) },
