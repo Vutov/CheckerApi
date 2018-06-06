@@ -27,12 +27,12 @@ namespace CheckerApi.Services
                     foreach (var alert in data)
                     {
                         // Avoid duplicate alerts
-                        if (!foundOrdersIDs.Contains(alert.BidEntry.NiceHashId))
+                        var sig = $"{alert.BidEntry.NiceHashId}{alert.BidEntry.NiceHashDataCenter}";
+                        if (!foundOrdersIDs.Contains(sig))
                         {
-                            foundOrdersIDs.Add(alert.BidEntry.NiceHashId);
+                            foundOrdersIDs.Add(sig);
                             foundOrders.Add(alert);
                         }
-                        
                     }
                 }
             }
