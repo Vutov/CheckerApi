@@ -15,7 +15,7 @@ namespace CheckerApi.Services.Conditions
             var foundOrders = new List<AlertDTO>();
             var aliveOrders = orders.Where(o => o.Alive).ToList();
             var threshold = aliveOrders.Sum(o => o.AcceptedSpeed) * config.AcceptedPercentThreshold;
-            var orderedOrders = aliveOrders.OrderByDescending(o => o.Price);
+            var orderedOrders = aliveOrders.OrderByDescending(o => o.Price).ToList();
             var currentAcceptedSpeed = 0d;
 
             BidEntry benchmarkOrder = null;
