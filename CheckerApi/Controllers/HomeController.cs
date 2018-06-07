@@ -30,6 +30,7 @@ namespace CheckerApi.Controllers
             {
                 Status = "Running",
                 FoundOrders = Context.Data.Count(),
+                AuditCount = Context.OrdersAudit.Count(),
                 Config = configSettings.Select(s => $"{s.Name} ({s.GetValue(config)})"),
                 Conditions = conditions
             });

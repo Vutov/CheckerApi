@@ -56,7 +56,8 @@ namespace CheckerApi.Services
                     var request = new RestRequest($"api?method=orders.get&location={location}&algo=24", Method.GET);
                     var response = client.Execute(request);
                     var data = JsonConvert.DeserializeObject<ResultDTO>(response.Content);
-                    var orders = data.Result.Orders.Select(o => CreateDTO(o, location)).ToList();
+                    // todo test null
+                    var orders = data?.Result?.Orders.Select(o => CreateDTO(o, location)).ToList();
 
                     var auditJob = _audit.CreateAudit(orders);
 
