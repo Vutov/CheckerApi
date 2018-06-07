@@ -82,7 +82,7 @@ namespace CheckerApi.Extensions
                     return certificate[0];
                 }
             }
-
+            
             if (config.FilePath != null && config.Password != null)
             {
                 return new X509Certificate2(config.FilePath, config.Password);

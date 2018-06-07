@@ -62,6 +62,7 @@ namespace CheckerApi
 
                     SelfLog.Enable(Console.Error);
                 })
+                // TODO Check if exists
                 .UseKestrel(options => options.ConfigureEndpoints())
                 .Build();
     }

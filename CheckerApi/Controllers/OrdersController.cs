@@ -28,19 +28,12 @@ namespace CheckerApi.Controllers
         }
 
         [HttpGet]
-        [Route("audit{identity?}.csv")]
+        [Route("audit.csv")]
         [Produces("text/csv")]
         public IActionResult GetAuditOrdersCsv([FromQuery]string from, [FromQuery]string to, [FromQuery] string id, [FromQuery]int top = 1000)
         {
-            try
-            {
-                var data = GetAudits(from, to, id, top);
-                return Ok(data);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            var data = GetAudits(from, to, id, top);
+            return Ok(data);
         }
 
         [HttpGet]

@@ -45,6 +45,7 @@ namespace CheckerApi
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            // TODO Check if exists
             app.SetupHttpsRedirect(Configuration, env);
 
             if (env.IsDevelopment())
