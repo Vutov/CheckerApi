@@ -38,10 +38,6 @@ namespace CheckerApi.Extensions
                     ipAddresses.Add(IPAddress.IPv6Loopback);
                     ipAddresses.Add(IPAddress.Loopback);
                 }
-                else if (config.Host == "0.0.0.0")
-                {
-                    ipAddresses.Add(IPAddress.Any);
-                }
                 else if (IPAddress.TryParse(config.Host, out var address))
                 {
                     ipAddresses.Add(address);
