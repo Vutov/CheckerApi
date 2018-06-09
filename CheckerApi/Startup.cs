@@ -33,6 +33,7 @@ namespace CheckerApi
             
             services.AddDbContext<ApiContext>(options =>
                 options.UseMySQL(Configuration.GetConnectionString("Connection")));
+
             services.AddTransient<ISyncService, SyncService>();
             services.AddTransient<INotificationManager, NotificationManager>();
             services.AddTransient<IConditionComplier, ConditionComplier>();
@@ -45,7 +46,6 @@ namespace CheckerApi
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            // TODO Check if exists
             app.SetupHttpsRedirect(Configuration, env);
 
             if (env.IsDevelopment())

@@ -16,13 +16,13 @@ namespace CheckerApi.Services
             var foundOrdersIDs = new HashSet<string>();
 
             // Conditions are in order of priority
-            var conditions = Registry.Conditions.OrderBy(c => c.Key).ToList();
+            var conditions = Registry.GetConditions().OrderBy(Registry.GetPriority).ToList();
             foreach (var conditionEntry in conditions)
             {
-                var setting = settings.FirstOrDefault(s => s.ConditionID == conditionEntry.Key);
+                var setting = settings.FirstOrDefault(s => s.ConditionName == conditionEntry.Name);
                 if (setting != null && setting.Enabled)
                 {
-                    ICondition condition = (ICondition) Activator.CreateInstance(conditionEntry.Value);
+                    ICondition condition = (ICondition) Activator.CreateInstance(conditionEntry);
                     var data = condition.Compute(orders, config);
                     foreach (var alert in data)
                     {

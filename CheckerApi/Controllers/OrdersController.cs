@@ -2,13 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using CheckerApi.Models.Entities;
-using CheckerApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Net.Http.Headers;
-using Newtonsoft.Json;
 
 namespace CheckerApi.Controllers
 {

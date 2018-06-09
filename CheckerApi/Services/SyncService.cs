@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using CheckerApi.Context;
@@ -14,14 +15,15 @@ using RestSharp;
 
 namespace CheckerApi.Services
 {
-    public class SyncService: ISyncService
+    public class SyncService : ISyncService
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<SyncService> _logger;
         private readonly IMapper _mapper;
-        private readonly ApiContext _context;
         private readonly INotificationManager _notification;
         private readonly IConditionComplier _condition;
         private readonly IAuditManager _audit;
+        private readonly ApiContext _context;
 
         private readonly int[] _locations = { 0, 1 };
         private readonly int _alertInterval;
@@ -29,12 +31,13 @@ namespace CheckerApi.Services
 
         public SyncService(IServiceProvider serviceProvider)
         {
+            _serviceProvider = serviceProvider;
             _logger = serviceProvider.GetService<ILogger<SyncService>>();
             _mapper = serviceProvider.GetService<IMapper>();
             _notification = serviceProvider.GetService<INotificationManager>();
             _condition = serviceProvider.GetService<IConditionComplier>();
-            _context = serviceProvider.GetService<ApiContext>();
             _audit = serviceProvider.GetService<IAuditManager>();
+            _context = serviceProvider.GetService<ApiContext>();
 
             var config = serviceProvider.GetService<IConfiguration>();
             _alertInterval = config.GetValue<int>("Api:Alert:IntervalMin");
@@ -44,7 +47,7 @@ namespace CheckerApi.Services
         public Result Run()
         {
             _logger.LogInformation("Sync Started");
-            
+
             try
             {
                 var config = _context.Configuration;
@@ -56,20 +59,18 @@ namespace CheckerApi.Services
                     var request = new RestRequest($"api?method=orders.get&location={location}&algo=24", Method.GET);
                     var response = client.Execute(request);
                     var data = JsonConvert.DeserializeObject<ResultDTO>(response.Content);
-                    // todo test null
-                    var orders = data?.Result?.Orders.Select(o => CreateDTO(o, location)).ToList();
+                    var orders = data.Result.Orders.Select(o => CreateDTO(o, location)).ToList();
 
-                    var auditJob = _audit.CreateAudit(orders);
+                    _audit.CreateAudit(orders);
 
                     var foundOrders = _condition.Check(orders, config, settings).ToList();
-                    foundOrders.ForEach(b => TriggerHook(b.Condition, b.Message));
+                    TriggerHooks(foundOrders);
+
                     if (foundOrders.Any())
                     {
                         _context.Data.AddRange(foundOrders.Select(b => b.BidEntry));
                         _context.SaveChanges();
                     }
-
-                    auditJob.Wait(TimeSpan.FromSeconds(5));
                 }
 
                 _logger.LogInformation("Sync Finished");
@@ -81,7 +82,7 @@ namespace CheckerApi.Services
                 return Result.Fail(ex.Message);
             }
         }
-        
+
         private BidEntry CreateDTO(BidDTO order, int location)
         {
             var data = _mapper.Map<BidEntry>(order);
@@ -90,19 +91,22 @@ namespace CheckerApi.Services
             return data;
         }
 
-        private void TriggerHook(string condition, string message)
+        private void TriggerHooks(IEnumerable<AlertDTO> alerts)
         {
-            var alert = string.Empty;
             var config = _context.Configuration;
-            if (DateTime.UtcNow.AddMinutes(-_alertInterval) >= config.LastNotification)
+            foreach (var alert in alerts)
             {
-                alert = _alertMessage;
-                config.LastNotification = DateTime.UtcNow;
-                _context.Configurations.Update(config);
-                _context.SaveChanges();
-            }
+                var alertMessage = string.Empty;
+                if (DateTime.UtcNow.AddMinutes(-_alertInterval) >= config.LastNotification)
+                {
+                    alertMessage = _alertMessage;
+                    config.LastNotification = DateTime.UtcNow;
+                    _context.Configurations.Update(config);
+                    _context.SaveChanges();
+                }
 
-            _notification.TriggerHook(message, condition, alert);
+                _notification.TriggerHook(alert.Message, alert.Condition, alertMessage);
+            }
         }
     }
 }

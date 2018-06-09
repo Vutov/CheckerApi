@@ -17,7 +17,7 @@ namespace CheckerApi.Context
         public DbSet<ConditionSetting> ConditionSettings { get; set; }
         public DbSet<BidAudit> OrdersAudit { get; set; }
 
-        public ApiConfiguration Configuration => Configurations.FirstOrDefault();
+        public ApiConfiguration Configuration => Configurations.OrderBy(c => c.ID).FirstOrDefault();
 
         public void Seed()
         {
@@ -39,15 +39,16 @@ namespace CheckerApi.Context
 
                 AddRange(config);
             }
-
-            foreach (var condition in Registry.Conditions)
+            
+            foreach (var condition in Registry.GetConditions())
             {
-                var name = condition.Value.Name;
+                var name = condition.Name;
                 if (ConditionSettings.FirstOrDefault(c => c.ConditionName == name) == null)
                 {
+                    var priority = Registry.GetPriority(condition);
                     var setting = new ConditionSetting()
                     {
-                        ConditionID = condition.Key,
+                        ConditionID = priority,
                         ConditionName = name,
                         Enabled = true
                     };

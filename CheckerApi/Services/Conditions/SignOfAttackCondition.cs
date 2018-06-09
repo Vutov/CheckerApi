@@ -6,6 +6,7 @@ using CheckerApi.Models.Entities;
 
 namespace CheckerApi.Services.Conditions
 {
+    [Condition(20)]
     public class SignOfAttackCondition : Condition
     {
         public static Queue<string> BidsTrack = new Queue<string>();

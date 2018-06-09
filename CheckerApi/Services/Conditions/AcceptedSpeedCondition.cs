@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 
 namespace CheckerApi.Services.Conditions
 {
+    [Condition(10)]
     public class AcceptedSpeedCondition: Condition
     {
         public static Queue<string> DataHashes = new Queue<string>();

@@ -6,6 +6,7 @@ using CheckerApi.Models.Entities;
 
 namespace CheckerApi.Services.Conditions
 {
+    [Condition(30)]
     public class PercentThresholdCondition: Condition
     {
         public static Queue<string> PercentageTrack = new Queue<string>();
