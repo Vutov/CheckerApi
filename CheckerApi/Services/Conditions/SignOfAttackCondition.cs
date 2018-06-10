@@ -26,7 +26,7 @@ namespace CheckerApi.Services.Conditions
                 if (order.Price + config.PriceThreshold >= highestOrder.Price &&
                     (order.LimitSpeed == 0 || order.LimitSpeed >= config.LimitSpeed) &&
                     order.AcceptedSpeed >= config.MinimalAcceptedSpeed
-                ) // todo add min accepted speed test
+                )
                 {
                     var sig = CreateSignSignature(order);
                     string conditon;
