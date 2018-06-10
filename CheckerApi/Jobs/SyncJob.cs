@@ -5,6 +5,7 @@ using Quartz;
 
 namespace CheckerApi.Jobs
 {
+    [DisallowConcurrentExecution]
     public class SyncJob : Job
     {
         public override void Execute(JobDataMap data, IServiceProvider serviceProvider)

@@ -9,6 +9,7 @@ using Quartz;
 
 namespace CheckerApi.Jobs
 {
+    [DisallowConcurrentExecution]
     public class CleanerJob : Job
     {
         public override void Execute(JobDataMap data, IServiceProvider serviceProvider)
