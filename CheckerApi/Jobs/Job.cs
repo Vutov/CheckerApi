@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Quartz;
@@ -14,16 +15,21 @@ namespace CheckerApi.Jobs
         {
             return Task.Run(() =>
             {
-                var serviceProvider = (IServiceProvider)context.MergedJobDataMap["serviceProvider"];
-                var logger = serviceProvider.GetService<ILogger<Job>>();
+                var host = (IWebHost)context.MergedJobDataMap["host"];
 
-                try
+                using (var scope = host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
                 {
-                    Execute(context.MergedJobDataMap, serviceProvider);
-                }
-                catch (Exception ex)
-                {
-                    logger.LogCritical($"Error executing Job {ex}");
+                    var serviceProvider = scope.ServiceProvider;
+                    var logger = serviceProvider.GetService<ILogger<Job>>();
+
+                    try
+                    {
+                        Execute(context.MergedJobDataMap, serviceProvider);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogCritical($"Error executing Job {ex}");
+                    }
                 }
             });
         }

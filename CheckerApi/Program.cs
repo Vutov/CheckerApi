@@ -18,11 +18,16 @@ namespace CheckerApi
             BuildWebHost(args)
                 .CreateVersionFile()
                 .SeedDatabase()
-                .SetupScheduler((scheduler, serviceProvider) =>
+                .SetupScheduler((scheduler, host) =>
                 {
-                    scheduler.AddJob<SyncJob>(serviceProvider,
+                    scheduler.AddJob<SyncJob>(host,
                         tb => tb.WithSimpleSchedule(x => x
                             .WithIntervalInSeconds(30)
+                            .RepeatForever()
+                        )
+                    ).AddJob<CleanerJob>(host,
+                        tb => tb.WithSimpleSchedule(x => x
+                            .WithIntervalInMinutes(15)
                             .RepeatForever()
                         )
                     );

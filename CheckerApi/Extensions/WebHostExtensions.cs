@@ -10,15 +10,11 @@ namespace CheckerApi.Extensions
 {
     public static class WebHostExtensions
     {
-        public static IWebHost SetupScheduler(this IWebHost host, Action<IScheduler, IServiceProvider> jobs)
+        public static IWebHost SetupScheduler(this IWebHost host, Action<IScheduler, IWebHost> jobs)
         {
             ISchedulerFactory schedFact = new StdSchedulerFactory();
             IScheduler scheduler = schedFact.GetScheduler().Result;
-            using (var serviceScope = host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
-            {
-                jobs(scheduler, serviceScope.ServiceProvider);
-            }
-
+            jobs(scheduler, host);
             scheduler.Start();
 
             return host;
