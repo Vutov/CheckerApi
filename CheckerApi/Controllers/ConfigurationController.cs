@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using CheckerApi.Models.Entities;
 using CheckerApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,9 +24,14 @@ namespace CheckerApi.Controllers
             if (Password != password || string.IsNullOrEmpty(setting))
                 return NotFound();
 
-            var (config, settings) = GetConfig();
+            var config = Context.Configuration;
+            var type = config.GetType();
+            var configSettings = type
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                .ToList();
+            configSettings.RemoveAll(p => p.Name.ToLower() == "id");
 
-            var settingProp = settings.FirstOrDefault(s => s.Name.ToLower() == setting.ToLower());
+            var settingProp = configSettings.FirstOrDefault(s => s.Name.ToLower() == setting.ToLower());
             if (settingProp == null)
                 return NotFound();
 

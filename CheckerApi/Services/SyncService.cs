@@ -17,7 +17,6 @@ namespace CheckerApi.Services
 {
     public class SyncService : ISyncService
     {
-        private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<SyncService> _logger;
         private readonly IMapper _mapper;
         private readonly INotificationManager _notification;
@@ -31,7 +30,6 @@ namespace CheckerApi.Services
 
         public SyncService(IServiceProvider serviceProvider)
         {
-            _serviceProvider = serviceProvider;
             _logger = serviceProvider.GetService<ILogger<SyncService>>();
             _mapper = serviceProvider.GetService<IMapper>();
             _notification = serviceProvider.GetService<INotificationManager>();
@@ -50,8 +48,8 @@ namespace CheckerApi.Services
 
             try
             {
-                var config = _context.Configuration;
-                var settings = _context.ConditionSettings.ToList();
+                var config = _context.ConfigurationReadOnly;
+                var settings = _context.ConditionSettingsReadOnly.ToList();
 
                 foreach (var location in _locations)
                 {

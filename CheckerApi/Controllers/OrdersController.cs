@@ -19,7 +19,7 @@ namespace CheckerApi.Controllers
         [Route("{top?}")]
         public IActionResult GetAlertOrders(int top = 10)
         {
-            return Ok(Context.Data.OrderByDescending(i => i.RecordDate).Take(top).ToList());
+            return Ok(Context.DataReadOnly.OrderByDescending(i => i.RecordDate).Take(top).ToList());
         }
 
         [HttpGet]
@@ -41,7 +41,7 @@ namespace CheckerApi.Controllers
 
         private List<BidAudit> GetAudits(string from, string to, string id, int top)
         {
-            IQueryable<BidAudit> baseQuery = Context.OrdersAudit.OrderByDescending(i => i.RecordDate);
+            IQueryable<BidAudit> baseQuery = Context.OrdersAuditsReadOnly.OrderByDescending(i => i.RecordDate);
             if (!string.IsNullOrEmpty(id))
             {
                 baseQuery = baseQuery.Where(r => r.NiceHashId == id);

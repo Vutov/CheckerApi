@@ -23,17 +23,5 @@ namespace CheckerApi.Controllers
         public IServiceProvider ServiceProvider { get; }
         public ApiContext Context { get; }
         public string Password { get; }
-
-        protected (ApiConfiguration config, List<PropertyInfo> configProps) GetConfig()
-        {
-            var config = Context.Configuration;
-            var type = config.GetType();
-            var settings = type
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
-                .ToList();
-            settings.RemoveAll(p => p.Name.ToLower() == "id");
-
-            return (config, settings);
-        }
     }
 }

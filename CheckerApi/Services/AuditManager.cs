@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using AutoMapper;
 using CheckerApi.Context;
 using CheckerApi.Models;
 using CheckerApi.Models.Entities;
 using CheckerApi.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -32,7 +32,7 @@ namespace CheckerApi.Services
 
         public Result CreateAudit(IEnumerable<BidEntry> bids)
         {
-            if (_context.Configuration.EnableAudit == false)
+            if (_context.ConfigurationReadOnly.EnableAudit == false)
             {
                 return Result.Ok();
             }
@@ -41,14 +41,12 @@ namespace CheckerApi.Services
             {
                 var auditData = _mapper.Map<IEnumerable<BidAudit>>(bids);
                 _context.OrdersAudit.AddRange(auditData);
+                _context.SaveChanges();
 
                 var recordThreshold = DateTime.UtcNow.Add(-_recordThreshold);
-                var toClean =  _context
-                    .OrdersAudit
-                    .Where(o => o.RecordDate <= recordThreshold)
-                    .ToList();
 
-                _context.OrdersAudit.RemoveRange(toClean);
+                // EF delete takes ages for large sets because of the tracking
+                _context.Database.ExecuteSqlCommand($"DELETE FROM OrderAudits WHERE RecordDate <= @p0;", recordThreshold.ToString("yyyy-MM-dd hh:mm:ss")); 
                 _context.SaveChanges();
 
                 return Result.Ok();

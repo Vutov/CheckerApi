@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using CheckerApi.Models.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,8 +21,12 @@ namespace CheckerApi.Controllers
         [Route("")]
         public IActionResult Status()
         {
-            var (config, configSettings) = GetConfig();
-            var conditions = Context.ConditionSettings
+            var settings = typeof(ApiConfiguration)
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                .ToList();
+            settings.RemoveAll(p => p.Name.ToLower() == "id");
+            
+            var conditions = Context.ConditionSettingsReadOnly
                 .OrderBy(o => o.ConditionID)
                 .Select(c => $"{c.ConditionName} ({c.Enabled})")
                 .ToList();
@@ -29,9 +34,9 @@ namespace CheckerApi.Controllers
             return Ok(new
             {
                 Status = "Running",
-                FoundOrders = Context.Data.Count(),
-                AuditCount = Context.OrdersAudit.Count(),
-                Config = configSettings.Select(s => $"{s.Name} ({s.GetValue(config)})"),
+                FoundOrders = Context.DataReadOnly.Count(),
+                AuditCount = Context.OrdersAuditsReadOnly.Count(),
+                Config = settings.Select(s => $"{s.Name} ({s.GetValue(Context.ConfigurationReadOnly)})"),
                 Conditions = conditions
             });
         }

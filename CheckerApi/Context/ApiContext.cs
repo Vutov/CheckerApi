@@ -19,6 +19,11 @@ namespace CheckerApi.Context
 
         public ApiConfiguration Configuration => Configurations.OrderBy(c => c.ID).FirstOrDefault();
 
+        public IQueryable<BidEntry> DataReadOnly => Data.AsNoTracking();
+        public ApiConfiguration ConfigurationReadOnly => Configurations.AsNoTracking().OrderBy(c => c.ID).FirstOrDefault();
+        public IQueryable<ConditionSetting> ConditionSettingsReadOnly => ConditionSettings.AsNoTracking();
+        public IQueryable<BidAudit> OrdersAuditsReadOnly => OrdersAudit.AsNoTracking();
+        
         public void Seed()
         {
             if (!Configurations.Any())
@@ -39,13 +44,14 @@ namespace CheckerApi.Context
 
                 AddRange(config);
             }
-            
+
             foreach (var condition in Registry.GetConditions())
             {
                 var name = condition.Name;
-                if (ConditionSettings.FirstOrDefault(c => c.ConditionName == name) == null)
+                var priority = Registry.GetPriority(condition);
+                var dbCondition = ConditionSettings.FirstOrDefault(c => c.ConditionName == name);
+                if (dbCondition == null)
                 {
-                    var priority = Registry.GetPriority(condition);
                     var setting = new ConditionSetting()
                     {
                         ConditionID = priority,
@@ -55,8 +61,12 @@ namespace CheckerApi.Context
 
                     Add(setting);
                 }
+                else if (dbCondition.ConditionID != priority)
+                {
+                    dbCondition.ConditionID = priority;
+                }
             }
-            
+
             SaveChanges();
         }
     }
