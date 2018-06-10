@@ -8,10 +8,15 @@ namespace CheckerApi.Extensions
     {
         public static IScheduler AddJob<T>(this IScheduler scheduler, IWebHost host, Func<TriggerBuilder, TriggerBuilder> triggerFunc) where T : IJob
         {
-            return scheduler.AddJob<T>(host, j => j, triggerFunc);
+            return scheduler.AddJob<T>(host, j => j, triggerFunc, DateTimeOffset.UtcNow);
         }
 
-        public static IScheduler AddJob<T>(this IScheduler scheduler, IWebHost host, Func<IJobDetail, IJobDetail> jobFunc, Func<TriggerBuilder, TriggerBuilder> triggerFunc) where T : IJob
+        public static IScheduler AddJob<T>(this IScheduler scheduler, IWebHost host, Func<TriggerBuilder, TriggerBuilder> triggerFunc, DateTimeOffset startAt) where T : IJob
+        {
+            return scheduler.AddJob<T>(host, j => j, triggerFunc, startAt);
+        }
+
+        public static IScheduler AddJob<T>(this IScheduler scheduler, IWebHost host, Func<IJobDetail, IJobDetail> jobFunc, Func<TriggerBuilder, TriggerBuilder> triggerFunc, DateTimeOffset startAt) where T : IJob
         {
             var guid = Guid.NewGuid().ToString();
             var job = jobFunc(JobBuilder.Create<T>()
@@ -21,7 +26,7 @@ namespace CheckerApi.Extensions
 
             var triggerBuilder = triggerFunc(TriggerBuilder.Create()
                 .WithIdentity(guid)
-                .StartNow());
+                .StartAt(startAt));
             var trigger = triggerBuilder.Build();
 
             scheduler.ScheduleJob(job, trigger);

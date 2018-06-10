@@ -27,9 +27,10 @@ namespace CheckerApi
                         )
                     ).AddJob<CleanerJob>(host,
                         tb => tb.WithSimpleSchedule(x => x
-                            .WithIntervalInMinutes(15)
+                            .WithIntervalInSeconds(30)
                             .RepeatForever()
-                        )
+                        ),
+                        startAt: DateTimeOffset.UtcNow.AddSeconds(15)
                     );
                 })
                 .Run();
