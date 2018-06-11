@@ -46,8 +46,12 @@ namespace CheckerApi
                         .Enrich.FromLogContext()
                         .Enrich.WithProperty("Environment", hostingContext.HostingEnvironment)
                         .Enrich.WithProperty("HostName", Environment.MachineName)
-                        .WriteTo.Console(theme: SystemConsoleTheme.Literate, restrictedToMinimumLevel: LogEventLevel.Warning)
-                        .WriteTo.File("./errorlogs.txt", LogEventLevel.Error);
+                        .WriteTo.Console(theme: SystemConsoleTheme.Literate, restrictedToMinimumLevel: LogEventLevel.Warning);
+
+                    if (hostingContext.HostingEnvironment.IsDevelopment())
+                    {
+                        loggerConfiguration.WriteTo.File("./errorlogs.txt", LogEventLevel.Error);
+                    }
 
                     SelfLog.Enable(Console.Error);
                 })
