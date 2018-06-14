@@ -36,7 +36,7 @@ namespace CheckerApi.Services
                     }
                 }
             }
-            
+
             return foundOrders;
         }
     }

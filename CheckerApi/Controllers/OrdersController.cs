@@ -34,7 +34,7 @@ namespace CheckerApi.Controllers
         public IActionResult GetAuditOrdersCsv([FromQuery]string from, [FromQuery]string to, [FromQuery] string id, [FromQuery]int top = 1000)
         {
             var data = GetAudits(from, to, id, top).ToCsv();
-            var stream = new MemoryStream(Encoding.UTF8.GetBytes(data ?? ""));
+            var stream = new MemoryStream(Encoding.UTF8.GetBytes(data ?? string.Empty));
             var timeStamp = CreateTimeStamp();
 
             return File(stream, "text/csv", $"audit{timeStamp}.csv");

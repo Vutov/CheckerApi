@@ -21,7 +21,7 @@ namespace CheckerApi.Jobs
             var recordThreshold = TimeSpan.FromMinutes(config.GetValue<int>("Api:ClearAuditMinutes"));
             var context = serviceProvider.GetService<ApiContext>();
             var time = DateTime.UtcNow.Add(-recordThreshold);
-           
+
             var toClean = context
                 .OrdersAudit
                 .Where(o => o.RecordDate <= time)

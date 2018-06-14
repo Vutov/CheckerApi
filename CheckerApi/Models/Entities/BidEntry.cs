@@ -5,6 +5,5 @@ namespace CheckerApi.Models.Entities
     [Table("Data")]
     public class BidEntry: BaseBid
     {
-        
     }
 }

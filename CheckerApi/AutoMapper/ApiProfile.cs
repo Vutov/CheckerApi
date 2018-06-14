@@ -10,11 +10,14 @@ namespace CheckerApi.AutoMapper
         public ApiProfile()
         {
             CreateMap<BidDTO, BidEntry>()
-                .ForMember(dest => dest.ID,
+                .ForMember(
+                    dest => dest.ID,
                     opt => opt.Ignore())
-                .ForMember(dest => dest.NiceHashId,
+                .ForMember(
+                    dest => dest.NiceHashId,
                     opts => opts.MapFrom(src => src.Id))
-                .ForMember(dest => dest.RecordDate,
+                .ForMember(
+                    dest => dest.RecordDate,
                     opts => opts.MapFrom(src => DateTime.UtcNow))
                 ;
 

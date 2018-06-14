@@ -19,7 +19,7 @@ namespace CheckerApi.Extensions
 
             return host;
         }
-        
+
         public static IWebHost CreateVersionFile(this IWebHost host)
         {
             File.WriteAllText("./version.txt", $"{DateTime.UtcNow:G}");
@@ -32,7 +32,6 @@ namespace CheckerApi.Extensions
             {
                 var context = serviceScope.ServiceProvider.GetService<ApiContext>();
                 context.Seed();
-
             }
 
             return host;

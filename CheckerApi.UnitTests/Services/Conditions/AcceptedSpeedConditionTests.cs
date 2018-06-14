@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace CheckerApi.UnitTests.Services.Conditions
 {
     [TestFixture]
-    class AcceptedSpeedConditionTests
+    public class AcceptedSpeedConditionTests
     {
         [TestCase(1)]
         [TestCase(2)]

@@ -19,7 +19,7 @@ namespace CheckerApi.UnitTests.Services.Conditions
             var config = new ApiConfiguration()
             {
                 LimitSpeed = 10
-            }; ;
+            };
 
             // Act
             var data = complier.Compute(GetSignBidSet(id), config);
@@ -27,7 +27,6 @@ namespace CheckerApi.UnitTests.Services.Conditions
             // Assert
             Assert.IsFalse(data.Any());
         }
-
 
         [Test]
         public void Compute_ShouldReturnBids_WhenMetCondition()

@@ -23,7 +23,7 @@ namespace CheckerApi.Context
         public ApiConfiguration ConfigurationReadOnly => Configurations.AsNoTracking().OrderBy(c => c.ID).FirstOrDefault();
         public IQueryable<ConditionSetting> ConditionSettingsReadOnly => ConditionSettings.AsNoTracking();
         public IQueryable<BidAudit> OrdersAuditsReadOnly => OrdersAudit.AsNoTracking();
-        
+
         public void Seed()
         {
             if (!Configurations.Any())

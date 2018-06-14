@@ -9,7 +9,7 @@ namespace CheckerApi.Services.Conditions
     [Condition(30)]
     public class PercentThresholdCondition: Condition
     {
-        public static Queue<string> PercentageTrack = new Queue<string>();
+        private static readonly Queue<string> PercentageTrack = new Queue<string>();
 
         public override IEnumerable<AlertDTO> Compute(IEnumerable<BidEntry> orders, ApiConfiguration config)
         {
@@ -35,7 +35,7 @@ namespace CheckerApi.Services.Conditions
             {
                 return foundOrders;
             }
-            
+
             foreach (var order in aliveOrders)
             {
                 if (order.Price >= benchmarkOrder.Price &&

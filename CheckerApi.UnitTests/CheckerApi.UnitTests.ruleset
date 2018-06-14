@@ -22,7 +22,8 @@
     <Rule Id="SA1633" Action="None" />
     <Rule Id="SA1024" Action="None" />
     <Rule Id="SA1413" Action="None" />
-    <Rule Id="CA1001" Action="Error" />
+    <Rule Id="SA1507" Action="Error" />
+	<Rule Id="CA1001" Action="Error" />
     <Rule Id="CA1009" Action="Error" />
     <Rule Id="CA1016" Action="Error" />
     <Rule Id="CA1033" Action="Error" />
@@ -84,6 +85,5 @@
     <Rule Id="CA2240" Action="Error" />
     <Rule Id="CA2241" Action="Error" />
     <Rule Id="CA2242" Action="Error" />
-    <Rule Id="SA1208" Action="None" />
   </Rules>
 </RuleSet>

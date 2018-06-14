@@ -14,16 +14,6 @@ namespace CheckerApi.Models
         public List<string> Messages { get; }
 
         public bool Status { get; }
-        
-        public bool IsSuccess()
-        {
-            return Status == true;
-        }
-
-        public bool HasFailed()
-        {
-            return Status == false;
-        }
 
         public static Result Ok(params string[] messages)
         {
@@ -33,6 +23,16 @@ namespace CheckerApi.Models
         public static Result Fail(params string[] messages)
         {
             return new Result(false, messages);
+        }
+
+        public bool IsSuccess()
+        {
+            return Status == true;
+        }
+
+        public bool HasFailed()
+        {
+            return Status == false;
         }
     }
 

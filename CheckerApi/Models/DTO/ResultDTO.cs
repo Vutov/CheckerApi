@@ -3,13 +3,13 @@ using Newtonsoft.Json;
 
 namespace CheckerApi.Models.DTO
 {
-    class ResultDTO
+    public class ResultDTO
     {
         [JsonProperty(PropertyName = "result")]
         public OrdersDTO Result { get; set; }
     }
 
-    class OrdersDTO
+    public class OrdersDTO
     {
         [JsonProperty(PropertyName = "orders")]
         public IEnumerable<BidDTO> Orders { get; set; }

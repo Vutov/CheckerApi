@@ -5,6 +5,5 @@ namespace CheckerApi.Models.Entities
     [Table("OrderAudits")]
     public class BidAudit: BaseBid
     {
-
     }
 }

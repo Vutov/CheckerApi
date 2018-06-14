@@ -20,12 +20,14 @@ namespace CheckerApi
                 .SeedDatabase()
                 .SetupScheduler((scheduler, host) =>
                 {
-                    scheduler.AddJob<SyncJob>(host,
+                    scheduler.AddJob<SyncJob>(
+                        host,
                         tb => tb.WithSimpleSchedule(x => x
                             .WithIntervalInSeconds(30)
                             .RepeatForever()
                         )
-                    ).AddJob<CleanerJob>(host,
+                    ).AddJob<CleanerJob>(
+                        host,
                         tb => tb.WithSimpleSchedule(x => x
                             .WithIntervalInSeconds(30)
                             .RepeatForever()

@@ -25,11 +25,11 @@ namespace CheckerApi
         }
 
         public IConfiguration Configuration { get; }
-        
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAutoMapper();
-            
+
             services.AddDbContext<ApiContext>(options =>
                 options.UseMySQL(Configuration.GetConnectionString("Connection")));
 
@@ -42,7 +42,7 @@ namespace CheckerApi
 
             services.AddMvc();
         }
-        
+
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.SetupHttpsRedirect(Configuration, env);

@@ -20,7 +20,9 @@ namespace CheckerApi.Controllers
         public IActionResult SetSetting(string setting, string value, string password = "")
         {
             if (Password != password || string.IsNullOrEmpty(setting))
+            {
                 return NotFound();
+            }
 
             var config = Context.Configuration;
             var type = config.GetType();
@@ -31,7 +33,9 @@ namespace CheckerApi.Controllers
 
             var settingProp = configSettings.FirstOrDefault(s => s.Name.ToLower() == setting.ToLower());
             if (settingProp == null)
+            {
                 return NotFound();
+            }
 
             var settingValue = Convert.ChangeType(value, settingProp.PropertyType);
             settingProp.SetValue(config, settingValue, null);
@@ -46,11 +50,15 @@ namespace CheckerApi.Controllers
         public IActionResult SetSetting(string condition, bool enabled, string password = "")
         {
             if (Password != password || string.IsNullOrEmpty(condition))
+            {
                 return NotFound();
+            }
 
             var conditionEntry = Context.ConditionSettings.FirstOrDefault(c => c.ConditionName == condition);
             if (conditionEntry == null)
+            {
                 return NotFound();
+            }
 
             conditionEntry.Enabled = enabled;
             Context.Update(conditionEntry);
@@ -64,12 +72,16 @@ namespace CheckerApi.Controllers
         public IActionResult TestNotifications(string password = "")
         {
             if (Password != password)
+            {
                 return NotFound();
+            }
 
             var notification = ServiceProvider.GetService<INotificationManager>();
             var result = notification.TriggerHook("Manual notification test, please ignore");
             if (result.HasFailed())
+            {
                 return BadRequest();
+            }
 
             return Ok();
         }
@@ -79,7 +91,9 @@ namespace CheckerApi.Controllers
         public IActionResult ClearConditionsCache(string password = "")
         {
             if (Password != password)
+            {
                 return NotFound();
+            }
 
             var conditions = Context.ConditionSettings.ToList();
             Context.ConditionSettings.RemoveRange(conditions);

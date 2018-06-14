@@ -16,7 +16,7 @@ namespace CheckerApi.Services
                 {
                     var fileInArchive = archive.CreateEntry(innerZipFile, CompressionLevel.Optimal);
                     using (var entryStream = fileInArchive.Open())
-                    using (var fileToCompressStream = new MemoryStream(Encoding.UTF8.GetBytes(data ?? "")))
+                    using (var fileToCompressStream = new MemoryStream(Encoding.UTF8.GetBytes(data ?? string.Empty)))
                     {
                         fileToCompressStream.CopyTo(entryStream);
                     }

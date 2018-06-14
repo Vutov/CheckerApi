@@ -9,7 +9,7 @@ namespace CheckerApi.Services.Conditions
     [Condition(20)]
     public class SignOfAttackCondition : Condition
     {
-        public static Queue<string> BidsTrack = new Queue<string>();
+        private static readonly Queue<string> BidsTrack = new Queue<string>();
 
         public override IEnumerable<AlertDTO> Compute(IEnumerable<BidEntry> orders, ApiConfiguration config)
         {
@@ -34,7 +34,7 @@ namespace CheckerApi.Services.Conditions
 
                     if (!BidsTrack.Contains(sig))
                     {
-                       BidsTrack.ConditionEnqueue(sig);
+                        BidsTrack.ConditionEnqueue(sig);
 
                         conditon = $"Condition: " +
                                    $"Order Alive ({order.Alive}) AND " +
@@ -55,7 +55,6 @@ namespace CheckerApi.Services.Conditions
                         Condition = conditon,
                         Message = message
                     });
-
                 }
             }
 

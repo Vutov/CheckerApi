@@ -9,7 +9,7 @@ namespace CheckerApi.Services.Conditions
     [Condition(10)]
     public class AcceptedSpeedCondition: Condition
     {
-        public static Queue<string> DataHashes = new Queue<string>();
+        private static readonly Queue<string> DataHashes = new Queue<string>();
 
         public override IEnumerable<AlertDTO> Compute(IEnumerable<BidEntry> orders, ApiConfiguration config)
         {

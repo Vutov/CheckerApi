@@ -14,9 +14,8 @@ namespace CheckerApi.Controllers
     {
         public HomeController(IServiceProvider serviceProvider): base(serviceProvider)
         {
-            
         }
-        
+
         [HttpGet]
         [Route("")]
         public IActionResult Status()
@@ -25,7 +24,7 @@ namespace CheckerApi.Controllers
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
                 .ToList();
             settings.RemoveAll(p => p.Name.ToLower() == "id");
-            
+
             var conditions = Context.ConditionSettingsReadOnly
                 .OrderBy(o => o.ConditionID)
                 .Select(c => $"{c.ConditionName} ({c.Enabled})")
