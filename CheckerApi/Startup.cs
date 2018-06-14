@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RestSharp;
-using WebApiContrib.Core.Formatter.Csv;
 
 namespace CheckerApi
 {
@@ -40,8 +39,7 @@ namespace CheckerApi
             services.AddTransient<IRestClient, RestClient>();
             services.AddTransient<IAuditManager, AuditManager>();
 
-            services.AddMvc()
-                .AddCsvSerializerFormatters();
+            services.AddMvc();
         }
         
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

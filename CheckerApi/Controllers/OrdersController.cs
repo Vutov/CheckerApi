@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using CheckerApi.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
+using ServiceStack;
+using ServiceStack.Text;
 
 namespace CheckerApi.Controllers
 {
@@ -24,11 +29,12 @@ namespace CheckerApi.Controllers
 
         [HttpGet]
         [Route("audit.csv")]
-        [Produces("text/csv")]
         public IActionResult GetAuditOrdersCsv([FromQuery]string from, [FromQuery]string to, [FromQuery] string id, [FromQuery]int top = 1000)
         {
-            var data = GetAudits(from, to, id, top);
-            return Ok(data);
+            var data = GetAudits(from, to, id, top).ToCsv();
+            var stream = new MemoryStream(Encoding.UTF8.GetBytes(data ?? ""));
+            var timeStamp = DateTime.UtcNow.ToString("yyyyMMddHHmmssffff");
+            return File(stream, "text/csv", $"audit{timeStamp}.csv");
         }
 
         [HttpGet]
@@ -58,7 +64,7 @@ namespace CheckerApi.Controllers
                 // ISO 8601
                 baseQuery = baseQuery.Where(r => r.RecordDate <= DateTime.ParseExact(to, "s", CultureInfo.InvariantCulture));
             }
-            
+
             var data = baseQuery.Take(top).ToList();
             return data;
         }
