@@ -68,7 +68,7 @@ namespace CheckerApi.Services
                     var foundOrders = _condition.Check(orders, config, settings).ToList();
                     sw.Stop();
                     var elapsed = sw.Elapsed;
-                    _logger.LogInformation($"Conditions check tool {elapsed.TotalSeconds} sec");
+                    _logger.LogInformation($"Conditions check took {elapsed.TotalSeconds} sec");
 
                     TriggerHooks(foundOrders);
 

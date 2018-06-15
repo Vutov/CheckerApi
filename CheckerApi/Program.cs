@@ -33,6 +33,13 @@ namespace CheckerApi
                             .RepeatForever()
                         ),
                         startAt: DateTimeOffset.UtcNow.AddSeconds(15)
+                    ).AddJob<ZipJob>(
+                        host,
+                        tb => tb.WithSimpleSchedule(x => x
+                            .WithIntervalInHours(24)
+                            .RepeatForever()
+                        ),
+                        startAt: DateTime.UtcNow.MiddleOfDay()
                     );
                 })
                 .Run();
@@ -45,10 +52,12 @@ namespace CheckerApi
                 {
                     loggerConfiguration
                         .MinimumLevel.Verbose()
+                        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                        .MinimumLevel.Override("Quartz", LogEventLevel.Warning)
                         .Enrich.FromLogContext()
                         .Enrich.WithProperty("Environment", hostingContext.HostingEnvironment)
                         .Enrich.WithProperty("HostName", Environment.MachineName)
-                        .WriteTo.Console(theme: SystemConsoleTheme.Literate, restrictedToMinimumLevel: LogEventLevel.Warning);
+                        .WriteTo.Console(theme: SystemConsoleTheme.Literate);
 
                     if (hostingContext.HostingEnvironment.IsDevelopment())
                     {
