@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using AutoMapper;
 using CheckerApi.Context;
@@ -44,6 +45,7 @@ namespace CheckerApi.Services
 
         public Result Run()
         {
+            var swSync = Stopwatch.StartNew();
             _logger.LogInformation("Sync Started");
 
             try
@@ -59,9 +61,15 @@ namespace CheckerApi.Services
                     var data = JsonConvert.DeserializeObject<ResultDTO>(response.Content);
                     var orders = data.Result.Orders.Select(o => CreateDTO(o, location)).ToList();
 
-                    _audit.CreateAudit(orders);
+                    var auditOrders = orders.Where(o => o.Alive && o.AcceptedSpeed > 0).ToList();
+                    _audit.CreateAudit(auditOrders);
 
+                    var sw = Stopwatch.StartNew();
                     var foundOrders = _condition.Check(orders, config, settings).ToList();
+                    sw.Stop();
+                    var elapsed = sw.Elapsed;
+                    _logger.LogInformation($"Conditions check tool {elapsed.TotalSeconds} sec");
+
                     TriggerHooks(foundOrders);
 
                     if (foundOrders.Any())
@@ -71,7 +79,10 @@ namespace CheckerApi.Services
                     }
                 }
 
-                _logger.LogInformation("Sync Finished");
+                swSync.Stop();
+                var elapsedSync = swSync.Elapsed;
+                _logger.LogInformation($"Sync Finished in {elapsedSync.TotalSeconds} sec");
+
                 return Result.Ok();
             }
             catch (Exception ex)
