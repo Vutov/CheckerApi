@@ -23,7 +23,7 @@ namespace CheckerApi.Jobs
             var context = serviceProvider.GetService<ApiContext>();
             var time = DateTime.UtcNow.Add(-recordThreshold);
 
-            context.Database.ExecuteSqlCommand(new RawSqlString($"DELETE FROM OrderAudits WHERE RecordDate <= '{time:s}'"));
+            context.Database.ExecuteSqlCommand(new RawSqlString("DELETE FROM OrderAudits WHERE RecordDate <= @p0"), $"{time:s}");
             context.SaveChanges();
 
             sw.Stop();

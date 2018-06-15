@@ -31,7 +31,7 @@ namespace CheckerApi
             services.AddAutoMapper();
 
             services.AddDbContext<ApiContext>(options =>
-                options.UseMySQL(Configuration.GetConnectionString("Connection")));
+                options.UseMySql(Configuration.GetConnectionString("Connection")));
 
             services.AddTransient<ISyncService, SyncService>();
             services.AddTransient<INotificationManager, NotificationManager>();
@@ -45,7 +45,8 @@ namespace CheckerApi
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.SetupHttpsRedirect(Configuration, env);
+            app.UseHttpsRedirection();
+            app.UseHsts();
 
             if (env.IsDevelopment())
             {

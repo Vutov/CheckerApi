@@ -66,7 +66,7 @@ namespace CheckerApi
 
                     SelfLog.Enable(Console.Error);
                 })
-                .UseKestrel(options => options.ConfigureEndpoints())
+                .UseKestrel()
                 .Build();
     }
 }

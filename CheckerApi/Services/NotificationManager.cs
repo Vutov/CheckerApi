@@ -24,7 +24,7 @@ namespace CheckerApi.Services
 
         public Result TriggerHook(params string[] messages)
         {
-            _logger.LogInformation($"TriggerHook Messages: '{string.Join(",", messages)}'");
+            _logger.LogTrace($"TriggerHook Messages: '{string.Join(",", messages)}'");
 
             try
             {
