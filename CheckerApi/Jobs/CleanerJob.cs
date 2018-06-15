@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using CheckerApi.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -22,12 +21,7 @@ namespace CheckerApi.Jobs
             var context = serviceProvider.GetService<ApiContext>();
             var time = DateTime.UtcNow.Add(-recordThreshold);
 
-            var toClean = context
-                .OrdersAudit
-                .Where(o => o.RecordDate <= time)
-                .ToList();
-
-            context.OrdersAudit.RemoveRange(toClean);
+            context.Database.ExecuteSqlCommand(new RawSqlString($"DELETE FROM OrderAudits WHERE RecordDate <= '{time:s}'"));
             context.SaveChanges();
 
             logger.LogInformation("Clean Ended");
