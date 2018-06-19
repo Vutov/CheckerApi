@@ -39,7 +39,7 @@ namespace CheckerApi
                             .WithIntervalInHours(24)
                             .RepeatForever()
                         ),
-                        startAt: DateTime.UtcNow.MiddleOfDay()
+                        startAt: DateTime.UtcNow.EndOfDay()
                     );
                 })
                 .Run();
