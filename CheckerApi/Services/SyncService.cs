@@ -25,9 +25,11 @@ namespace CheckerApi.Services
         private readonly IAuditManager _audit;
         private readonly ApiContext _context;
 
-        private readonly int[] _locations = { 0, 1 };
+        private readonly int[] _locations;
         private readonly int _alertInterval;
         private readonly string _alertMessage;
+        private readonly string _url;
+        private readonly string _request;
 
         public SyncService(IServiceProvider serviceProvider)
         {
@@ -41,6 +43,9 @@ namespace CheckerApi.Services
             var config = serviceProvider.GetService<IConfiguration>();
             _alertInterval = config.GetValue<int>("Api:Alert:IntervalMin");
             _alertMessage = config.GetValue<string>("Api:Alert:Message");
+            _url = config.GetValue<string>("NiceHash:Url");
+            _request = config.GetValue<string>("NiceHash:Request");
+            _locations = config.GetValue<int[]>("NiceHash:Locations");
         }
 
         public Result Run()
@@ -55,8 +60,8 @@ namespace CheckerApi.Services
 
                 foreach (var location in _locations)
                 {
-                    var client = new RestClient("https://api.nicehash.com/");
-                    var request = new RestRequest($"api?method=orders.get&location={location}&algo=24", Method.GET);
+                    var client = new RestClient(_url);
+                    var request = new RestRequest(_request.Replace("{location}", location.ToString()), Method.GET);
                     var response = client.Execute(request);
                     var data = JsonConvert.DeserializeObject<ResultDTO>(response.Content);
                     var orders = data.Result.Orders.Select(o => CreateDTO(o, location)).ToList();

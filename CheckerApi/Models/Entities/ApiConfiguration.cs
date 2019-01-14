@@ -14,5 +14,6 @@ namespace CheckerApi.Models.Entities
         public double MinimalAcceptedSpeed { get; set; }
         public double AcceptedPercentThreshold { get; set; }
         public bool EnableAudit { get; set; }
+        public double TotalHashThreshold { get; set; }
     }
 }

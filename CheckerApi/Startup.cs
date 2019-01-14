@@ -29,6 +29,7 @@ namespace CheckerApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAutoMapper();
+            services.AddMemoryCache();
 
             services.AddDbContext<ApiContext>(options =>
                 options.UseMySql(Configuration.GetConnectionString("Connection")));

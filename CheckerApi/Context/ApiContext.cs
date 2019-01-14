@@ -38,7 +38,8 @@ namespace CheckerApi.Context
                         LastNotification = DateTime.UtcNow.AddMinutes(-15),
                         MinimalAcceptedSpeed = 0.003,
                         AcceptedPercentThreshold = 0.1,
-                        EnableAudit = true
+                        EnableAudit = true,
+                        TotalHashThreshold = 0.8,
                     }
                 };
 
