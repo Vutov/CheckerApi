@@ -10,6 +10,13 @@ namespace CheckerApi.Services
 {
     public class ConditionComplier: IConditionComplier
     {
+        private IServiceProvider _serviceProvider;
+
+        public ConditionComplier(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
         public IEnumerable<AlertDTO> Check(IEnumerable<BidEntry> orders, ApiConfiguration config, IEnumerable<ConditionSetting> settings)
         {
             var foundOrders = new List<AlertDTO>();
@@ -22,7 +29,7 @@ namespace CheckerApi.Services
                 var setting = settings.FirstOrDefault(s => s.ConditionName == conditionEntry.Name);
                 if (setting != null && setting.Enabled)
                 {
-                    ICondition condition = (ICondition) Activator.CreateInstance(conditionEntry);
+                    ICondition condition = (ICondition) Activator.CreateInstance(conditionEntry, args: _serviceProvider);
                     var data = condition.Compute(orders, config);
                     foreach (var alert in data)
                     {

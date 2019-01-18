@@ -208,3 +208,4 @@ namespace CheckerApi.UnitTests.Services.Conditions
         //    }
         //}
     }
+}

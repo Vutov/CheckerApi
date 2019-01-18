@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
@@ -15,6 +16,13 @@ namespace CheckerApi.Services.Conditions
             { 0, "Europe" },
             { 1, "USA" },
         };
+
+        public Condition(IServiceProvider serviceProvider)
+        {
+            ServiceProvider = serviceProvider;
+        }
+
+        protected IServiceProvider ServiceProvider { get; set; }
 
         public abstract IEnumerable<AlertDTO> Compute(IEnumerable<BidEntry> orders, ApiConfiguration config);
 

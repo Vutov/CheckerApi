@@ -45,7 +45,7 @@ namespace CheckerApi.Services
             _alertMessage = config.GetValue<string>("Api:Alert:Message");
             _url = config.GetValue<string>("NiceHash:Url");
             _request = config.GetValue<string>("NiceHash:Request");
-            _locations = config.GetValue<int[]>("NiceHash:Locations");
+            _locations = config.GetSection("NiceHash:Locations").Get<int[]>();
         }
 
         public Result Run()

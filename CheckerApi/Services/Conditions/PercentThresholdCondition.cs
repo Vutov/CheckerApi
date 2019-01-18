@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CheckerApi.Extensions;
 using CheckerApi.Models.DTO;
@@ -10,6 +11,9 @@ namespace CheckerApi.Services.Conditions
     public class PercentThresholdCondition: Condition
     {
         private static readonly Queue<string> PercentageTrack = new Queue<string>();
+        public PercentThresholdCondition(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
 
         public override IEnumerable<AlertDTO> Compute(IEnumerable<BidEntry> orders, ApiConfiguration config)
         {

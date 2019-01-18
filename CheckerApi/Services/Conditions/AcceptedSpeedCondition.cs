@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CheckerApi.Extensions;
 using CheckerApi.Models.DTO;
 using CheckerApi.Models.Entities;
@@ -10,6 +11,9 @@ namespace CheckerApi.Services.Conditions
     public class AcceptedSpeedCondition: Condition
     {
         private static readonly Queue<string> DataHashes = new Queue<string>();
+        public AcceptedSpeedCondition(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
 
         public override IEnumerable<AlertDTO> Compute(IEnumerable<BidEntry> orders, ApiConfiguration config)
         {

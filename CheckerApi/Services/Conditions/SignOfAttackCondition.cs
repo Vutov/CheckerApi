@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CheckerApi.Extensions;
 using CheckerApi.Models.DTO;
@@ -10,6 +11,10 @@ namespace CheckerApi.Services.Conditions
     public class SignOfAttackCondition : Condition
     {
         private static readonly Queue<string> BidsTrack = new Queue<string>();
+
+        public SignOfAttackCondition(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
 
         public override IEnumerable<AlertDTO> Compute(IEnumerable<BidEntry> orders, ApiConfiguration config)
         {

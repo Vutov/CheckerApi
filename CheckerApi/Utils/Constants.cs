@@ -2,6 +2,6 @@
 {
     public static class Constants
     {
-        public static string HashRateKey = "HashRateKey";
+        public static string HashRateKey { get; } = "HashRateKey";
     }
 }

@@ -3,6 +3,7 @@ using CheckerApi.Extensions;
 using CheckerApi.Jobs;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Quartz;
 using Serilog;
 using Serilog.Debugging;
@@ -40,6 +41,12 @@ namespace CheckerApi
                             .RepeatForever()
                         ),
                         startAt: DateTime.UtcNow.EndOfDay()
+                    ).AddJob<NetworkHashrateJob>(
+                        host,
+                        tb => tb.WithSimpleSchedule(x => x
+                            .WithIntervalInMinutes(5)
+                            .RepeatForever()
+                        )
                     );
                 })
                 .Run();
@@ -47,6 +54,14 @@ namespace CheckerApi
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    var env = hostingContext.HostingEnvironment;
+                    config.SetBasePath(env.ContentRootPath);
+                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                    config.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true);
+                    config.AddEnvironmentVariables();
+                })
                 .UseStartup<Startup>()
                 .UseSerilog((hostingContext, loggerConfiguration) =>
                 {
