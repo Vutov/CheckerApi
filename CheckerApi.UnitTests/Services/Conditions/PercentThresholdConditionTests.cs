@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CheckerApi.Models.Entities;
 using CheckerApi.Services.Conditions;
+using Moq;
 using NUnit.Framework;
 
 namespace CheckerApi.UnitTests.Services.Conditions
@@ -9,13 +11,21 @@ namespace CheckerApi.UnitTests.Services.Conditions
     [TestFixture]
     public class PercentThresholdConditionTests
     {
+        private Mock<IServiceProvider> _serviceProvider;
+
+        [SetUp]
+        public void Setup()
+        {
+            _serviceProvider = new Mock<IServiceProvider>();
+        }
+
         [TestCase(1)]
         [TestCase(2)]
         [TestCase(3)]
         public void Compute_ShouldReturnEmptyList_WhenNothingMeetsCondition(int id)
         {
             // Arrange
-            var complier = new PercentThresholdCondition();
+            var complier = new PercentThresholdCondition(_serviceProvider.Object);
             var config = new ApiConfiguration()
             {
                 LimitSpeed = 10
@@ -32,7 +42,7 @@ namespace CheckerApi.UnitTests.Services.Conditions
         public void Compute_ShouldReturnBids_WhenMetCondition()
         {
             // Arrange
-            var complier = new PercentThresholdCondition();
+            var complier = new PercentThresholdCondition(_serviceProvider.Object);
 
             // Total AcceptedSpeed = 45, 10% = 4.5, order by price - ID 22, 19, 18. 4,5 power from top is id 19.
             // price threahold above is 10. Orders with price > 10 and matching conditions are id 22, 19
@@ -58,7 +68,7 @@ namespace CheckerApi.UnitTests.Services.Conditions
         public void Compute_ShouldReturnBidsUpdate_WhenBidSeen()
         {
             // Arrange
-            var complier = new PercentThresholdCondition();
+            var complier = new PercentThresholdCondition(_serviceProvider.Object);
 
             // Total AcceptedSpeed = 45, 10% = 4.5, order by price - ID 22, 19, 18. 4,5 power from top is id 19.
             // price threahold above is 10. Orders with price > 10 and matching conditions are id 22, 19

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
 using RestSharp;
 
 namespace CheckerApi
@@ -28,9 +29,14 @@ namespace CheckerApi
             services.AddDbContext<ApiContext>(options =>
                 options.UseMySql(Configuration.GetConnectionString("Connection")));
 
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Checker API", Version = "v1" });
+            });
+
             services.AddTransient<ISyncService, SyncService>();
             services.AddTransient<INotificationManager, NotificationManager>();
-            services.AddTransient<IConditionComplier, ConditionComplier>();
+            services.AddTransient<IConditionCompiler, ConditionCompiler>();
             services.AddTransient<IRestClient, RestClient>();
             services.AddTransient<IAuditManager, AuditManager>();
             services.AddTransient<ICompressService, CompressService>();
@@ -47,6 +53,12 @@ namespace CheckerApi
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Checker API V1");
+            });
 
             app.UseMvcWithDefaultRoute();
         }

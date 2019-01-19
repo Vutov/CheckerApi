@@ -37,7 +37,7 @@ namespace CheckerApi.Extensions
 
         public static DateTime EndOfMonth(this DateTime date)
         {
-            return new DateTime(date.Year, date.Month + 1, 1).AddDays(-1).EndOfDay();
+            return new DateTime(date.Year, date.Month, 1).AddMonths(1).AddDays(-1).EndOfDay();
         }
     }
 }

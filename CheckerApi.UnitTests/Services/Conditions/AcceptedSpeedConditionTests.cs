@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CheckerApi.Models.Entities;
 using CheckerApi.Services.Conditions;
+using Moq;
 using NUnit.Framework;
 
 namespace CheckerApi.UnitTests.Services.Conditions
@@ -9,13 +11,21 @@ namespace CheckerApi.UnitTests.Services.Conditions
     [TestFixture]
     public class AcceptedSpeedConditionTests
     {
+        private Mock<IServiceProvider> _serviceProvider;
+
+        [SetUp]
+        public void Setup()
+        {
+            _serviceProvider = new Mock<IServiceProvider>();
+        }
+
         [TestCase(1)]
         [TestCase(2)]
         [TestCase(3)]
         public void Compute_ShouldReturnEmptyList_WhenNothingMeetsCondition(int id)
         {
             // Arrange
-            var complier = new AcceptedSpeedCondition();
+            var complier = new AcceptedSpeedCondition(_serviceProvider.Object);
             var config = new ApiConfiguration()
             {
                 AcceptedSpeed = 10
@@ -32,7 +42,7 @@ namespace CheckerApi.UnitTests.Services.Conditions
         public void Compute_ShouldReturnBids_WhenMetCondition()
         {
             // Arrange
-            var complier = new AcceptedSpeedCondition();
+            var complier = new AcceptedSpeedCondition(_serviceProvider.Object);
             var orders = new List<BidEntry>()
             {
                 new BidEntry()
@@ -57,7 +67,7 @@ namespace CheckerApi.UnitTests.Services.Conditions
         public void Compute_ShouldReturnBids_WhenMetCondition_Multiple()
         {
             // Arrange
-            var complier = new AcceptedSpeedCondition();
+            var complier = new AcceptedSpeedCondition(_serviceProvider.Object);
             var orders = new List<BidEntry>()
             {
                 new BidEntry()
@@ -94,7 +104,7 @@ namespace CheckerApi.UnitTests.Services.Conditions
         public void Compute_ShouldNotReturnBids_WhenMetConditionByCached()
         {
             // Arrange
-            var complier = new AcceptedSpeedCondition();
+            var complier = new AcceptedSpeedCondition(_serviceProvider.Object);
             var orders = new List<BidEntry>()
             {
                 new BidEntry()

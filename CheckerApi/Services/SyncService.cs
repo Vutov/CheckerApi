@@ -21,7 +21,7 @@ namespace CheckerApi.Services
         private readonly ILogger<SyncService> _logger;
         private readonly IMapper _mapper;
         private readonly INotificationManager _notification;
-        private readonly IConditionComplier _condition;
+        private readonly IConditionCompiler _condition;
         private readonly IAuditManager _audit;
         private readonly ApiContext _context;
 
@@ -36,7 +36,7 @@ namespace CheckerApi.Services
             _logger = serviceProvider.GetService<ILogger<SyncService>>();
             _mapper = serviceProvider.GetService<IMapper>();
             _notification = serviceProvider.GetService<INotificationManager>();
-            _condition = serviceProvider.GetService<IConditionComplier>();
+            _condition = serviceProvider.GetService<IConditionCompiler>();
             _audit = serviceProvider.GetService<IAuditManager>();
             _context = serviceProvider.GetService<ApiContext>();
 
@@ -50,13 +50,11 @@ namespace CheckerApi.Services
 
         public Result Run()
         {
-            var swSync = Stopwatch.StartNew();
-            _logger.LogInformation("Sync Started");
-
             try
             {
                 var config = _context.ConfigurationReadOnly;
                 var settings = _context.ConditionSettingsReadOnly.ToList();
+                var totalOrders = new List<List<BidEntry>>();
 
                 foreach (var location in _locations)
                 {
@@ -65,28 +63,25 @@ namespace CheckerApi.Services
                     var response = client.Execute(request);
                     var data = JsonConvert.DeserializeObject<ResultDTO>(response.Content);
                     var orders = data.Result.Orders.Select(o => CreateDTO(o, location)).ToList();
+                    totalOrders.Add(orders);
 
                     var auditOrders = orders.Where(o => o.Alive && o.AcceptedSpeed > 0).ToList();
                     _audit.CreateAudit(auditOrders);
-
-                    var sw = Stopwatch.StartNew();
-                    var foundOrders = _condition.Check(orders, config, settings).ToList();
-                    sw.Stop();
-                    var elapsed = sw.Elapsed;
-                    _logger.LogInformation($"Conditions check took {elapsed.TotalSeconds} sec");
-
-                    TriggerHooks(foundOrders);
-
-                    if (foundOrders.Any())
-                    {
-                        _context.Data.AddRange(foundOrders.Select(b => b.BidEntry));
-                        _context.SaveChanges();
-                    }
                 }
 
-                swSync.Stop();
-                var elapsedSync = swSync.Elapsed;
-                _logger.LogInformation($"Sync Finished in {elapsedSync.TotalSeconds} sec");
+                var sw = Stopwatch.StartNew();
+                var foundOrders = _condition.Check(totalOrders, config, settings).ToList();
+                sw.Stop();
+                var elapsed = sw.Elapsed;
+                _logger.LogInformation($"Conditions check took {elapsed.TotalSeconds} sec");
+
+                TriggerHooks(foundOrders);
+
+                if (foundOrders.Any())
+                {
+                    _context.Data.AddRange(foundOrders.Select(b => b.BidEntry));
+                    _context.SaveChanges();
+                }
 
                 return Result.Ok();
             }

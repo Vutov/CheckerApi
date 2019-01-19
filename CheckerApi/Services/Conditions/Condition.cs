@@ -17,7 +17,7 @@ namespace CheckerApi.Services.Conditions
             { 1, "USA" },
         };
 
-        public Condition(IServiceProvider serviceProvider)
+        protected Condition(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
         }

@@ -31,6 +31,7 @@
     <PackageReference Include="Serilog.Sinks.File" Version="4.0.1-dev-00796" />
     <PackageReference Include="ServiceStack.Text.Core" Version="5.4.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta008" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-beta" />
     <PackageReference Include="WebApiContrib.Core.Formatter.Csv" Version="3.0.0" />
   </ItemGroup>
 

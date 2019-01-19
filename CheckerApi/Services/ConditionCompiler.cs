@@ -4,20 +4,21 @@ using System.Linq;
 using CheckerApi.Context;
 using CheckerApi.Models.DTO;
 using CheckerApi.Models.Entities;
+using CheckerApi.Services.Conditions;
 using CheckerApi.Services.Interfaces;
 
 namespace CheckerApi.Services
 {
-    public class ConditionComplier: IConditionComplier
+    public class ConditionCompiler: IConditionCompiler
     {
-        private IServiceProvider _serviceProvider;
+        private readonly IServiceProvider _serviceProvider;
 
-        public ConditionComplier(IServiceProvider serviceProvider)
+        public ConditionCompiler(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
 
-        public IEnumerable<AlertDTO> Check(IEnumerable<BidEntry> orders, ApiConfiguration config, IEnumerable<ConditionSetting> settings)
+        public IEnumerable<AlertDTO> Check(IEnumerable<IEnumerable<BidEntry>> orders, ApiConfiguration config, IEnumerable<ConditionSetting> settings)
         {
             var foundOrders = new List<AlertDTO>();
             var foundOrdersIDs = new HashSet<string>();
@@ -29,8 +30,20 @@ namespace CheckerApi.Services
                 var setting = settings.FirstOrDefault(s => s.ConditionName == conditionEntry.Name);
                 if (setting != null && setting.Enabled)
                 {
+                    var data = new List<AlertDTO>();
                     ICondition condition = (ICondition) Activator.CreateInstance(conditionEntry, args: _serviceProvider);
-                    var data = condition.Compute(orders, config);
+                    if (conditionEntry.IsDefined(typeof(GlobalConditionAttribute), false))
+                    {
+                        data = condition.Compute(orders.SelectMany(o => o), config).ToList();
+                    }
+                    else
+                    {
+                        foreach (var order in orders)
+                        {
+                            data.AddRange(condition.Compute(order, config));
+                        }
+                    }
+
                     foreach (var alert in data)
                     {
                         // Avoid duplicate alerts

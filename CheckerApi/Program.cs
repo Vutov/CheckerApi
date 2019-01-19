@@ -4,6 +4,7 @@ using CheckerApi.Jobs;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 using Serilog;
 using Serilog.Debugging;
@@ -26,14 +27,15 @@ namespace CheckerApi
                         tb => tb.WithSimpleSchedule(x => x
                             .WithIntervalInSeconds(30)
                             .RepeatForever()
-                        )
+                        ),
+                        startAt: DateTimeOffset.UtcNow.AddSeconds(15)
                     ).AddJob<CleanerJob>(
                         host,
                         tb => tb.WithSimpleSchedule(x => x
                             .WithIntervalInSeconds(30)
                             .RepeatForever()
                         ),
-                        startAt: DateTimeOffset.UtcNow.AddSeconds(15)
+                        startAt: DateTimeOffset.UtcNow.AddSeconds(30)
                     ).AddJob<ZipJob>(
                         host,
                         tb => tb.WithSimpleSchedule(x => x
@@ -41,13 +43,24 @@ namespace CheckerApi
                             .RepeatForever()
                         ),
                         startAt: DateTime.UtcNow.EndOfDay()
-                    ).AddJob<NetworkHashrateJob>(
-                        host,
-                        tb => tb.WithSimpleSchedule(x => x
-                            .WithIntervalInMinutes(5)
-                            .RepeatForever()
-                        )
                     );
+
+                    using (var serviceScope = host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+                    {
+                        var config = serviceScope.ServiceProvider.GetService<IConfiguration>();
+                        var pool = config.GetValue<string>("Pool:Url");
+                        if (!string.IsNullOrEmpty(pool))
+                        {
+                            scheduler.AddJob<NetworkHashrateJob>(
+                                host,
+                                tb => tb.WithSimpleSchedule(x => x
+                                    .WithIntervalInMinutes(5)
+                                    .RepeatForever()
+                                ),
+                                startAt: DateTimeOffset.UtcNow.AddSeconds(5)
+                            );
+                        }
+                    }
                 })
                 .Run();
         }

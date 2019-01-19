@@ -34,14 +34,14 @@ namespace CheckerApi.Services.Conditions
                 )
                 {
                     var sig = CreateSignSignature(order);
-                    string conditon;
+                    string condition;
                     string message;
 
                     if (!BidsTrack.Contains(sig))
                     {
                         BidsTrack.ConditionEnqueue(sig);
 
-                        conditon = $"Condition: " +
+                        condition = $"Condition: " +
                                    $"Order Alive ({order.Alive}) AND " +
                                    $"Order Price ({order.Price}) within '{config.PriceThreshold}' of top Order Price ({highestOrder.Price}, ID: {highestOrder.NiceHashId}) AND " +
                                    $"(Order Speed Limit ({order.LimitSpeed}) = 0 OR Order Speed Limit ({order.LimitSpeed}) >= '{config.LimitSpeed}') AND" +
@@ -50,14 +50,14 @@ namespace CheckerApi.Services.Conditions
                     }
                     else
                     {
-                        conditon = string.Empty;
+                        condition = string.Empty;
                         message = $"SUSPICIOUS BID Progress - {CreateMessageForProgress(order)} .";
                     }
 
                     foundOrders.Add(new AlertDTO()
                     {
                         BidEntry = order,
-                        Condition = conditon,
+                        Condition = condition,
                         Message = message
                     });
                 }

@@ -11,4 +11,11 @@ namespace CheckerApi.Services.Conditions
 
         public int Priority { get; set; }
     }
+
+    public class GlobalConditionAttribute : ConditionAttribute
+    {
+        public GlobalConditionAttribute(int priority) : base(priority)
+        {
+        }
+    }
 }

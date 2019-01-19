@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,8 @@ namespace CheckerApi.Jobs
                 {
                     var serviceProvider = scope.ServiceProvider;
                     var logger = serviceProvider.GetService<ILogger<Job>>();
+                    logger.LogInformation($"{GetType().Name} Started.");
+                    var sw = Stopwatch.StartNew();
 
                     try
                     {
@@ -28,8 +31,12 @@ namespace CheckerApi.Jobs
                     }
                     catch (Exception ex)
                     {
-                        logger.LogCritical($"Error executing Job {ex}");
+                        logger.LogCritical($"{GetType().Name} Error: {ex}");
                     }
+
+                    sw.Stop();
+                    var elapsed = sw.Elapsed;
+                    logger.LogInformation($"{GetType().Name} Finished in {elapsed.TotalSeconds} sec.");
                 }
             });
         }

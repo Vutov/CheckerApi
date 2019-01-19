@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CheckerApi.Services.Conditions
 {
-    [Condition(5)]
+    [GlobalCondition(5)]
     public class TotalMarketCondition : Condition
     {
         public TotalMarketCondition(IServiceProvider serviceProvider) : base(serviceProvider)
@@ -27,15 +27,14 @@ namespace CheckerApi.Services.Conditions
             var totalOrderHash = aliveOrders.Sum(o => o.AcceptedSpeed);
 
             var cache = ServiceProvider.GetService<IMemoryCache>();
-            cache.TryGetValue<double?>(Constants.HashRateKey, out var networkRate);
+            var hasRate = cache.TryGetValue<double>(Constants.HashRateKey, out var networkRate);
 
-            // TODO invert <
-            if (networkRate.HasValue && totalOrderHash * 1000000 * threshold < networkRate.Value)
+            if (hasRate && totalOrderHash * 1000000 * threshold >= networkRate)
             {
                 string condition = $"Condition: " +
-                                  $"Active Orders Hash ({totalOrderHash * 1000000}) above or equal to " +
-                                  $"{threshold * 100}% of " +
-                                  $"Total Network Hash ({networkRate.Value})";
+                                  $"Active Orders Hash ({totalOrderHash * 1000000:F2}) above or equal to " +
+                                  $"{threshold * 100:F2}% of " +
+                                  $"Total Network Hash ({networkRate:F2}) ";
                 string message = $"{MessagePrefix}Market Total Threshold ALERT - 'AT RISK'. ";
 
                 foundOrders.Add(new AlertDTO()
