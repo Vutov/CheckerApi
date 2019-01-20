@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using CheckerApi.Models.Entities;
+using CheckerApi.Models.Responses;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +19,7 @@ namespace CheckerApi.Controllers
 
         [HttpGet]
         [Route("")]
+        [ProducesResponseType(typeof(BotStatusResponse), 200)]
         public IActionResult Status()
         {
             var settings = typeof(ApiConfiguration)
@@ -30,7 +32,7 @@ namespace CheckerApi.Controllers
                 .Select(c => $"{c.ConditionName} ({c.Enabled})")
                 .ToList();
 
-            return Ok(new
+            return Ok(new BotStatusResponse
             {
                 Status = "Running",
                 FoundOrders = Context.DataReadOnly.Count(),
@@ -42,6 +44,7 @@ namespace CheckerApi.Controllers
 
         [HttpGet]
         [Route("version")]
+        [ProducesResponseType(typeof(BotVersionResponse), 200)]
         public IActionResult GetVersion()
         {
             var env = ServiceProvider.GetService<IHostingEnvironment>();
@@ -49,7 +52,7 @@ namespace CheckerApi.Controllers
             Assembly assembly = Assembly.GetExecutingAssembly();
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
 
-            return Ok(new
+            return Ok(new BotVersionResponse
             {
                 BuildDate = build,
                 Environment = env.EnvironmentName,

@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using CheckerApi.Filters;
+using CheckerApi.Models.Entities;
 using CheckerApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,15 +18,14 @@ namespace CheckerApi.Controllers
         {
         }
 
+        [AuthenticateFilter]
         [HttpGet]
-        [Route("{setting}/{value}/{password?}")]
-        public IActionResult SetSetting(string setting, string value, string password = "")
+        [Route("{setting}/{value}/{password}")]
+        [ProducesResponseType(typeof(string), 200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public IActionResult SetSetting(string setting, string value, string password)
         {
-            if (Password != password || string.IsNullOrEmpty(setting))
-            {
-                return NotFound();
-            }
-
             var config = Context.Configuration;
             var type = config.GetType();
             var configSettings = type
@@ -45,15 +47,14 @@ namespace CheckerApi.Controllers
             return Ok(value);
         }
 
+        [AuthenticateFilter]
         [HttpGet]
-        [Route("condition/{condition}/{enabled}/{password?}")]
-        public IActionResult SetSetting(string condition, bool enabled, string password = "")
+        [Route("condition/{condition}/{enabled}/{password}")]
+        [ProducesResponseType(typeof(bool), 200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public IActionResult SetSetting(string condition, bool enabled, string password)
         {
-            if (Password != password || string.IsNullOrEmpty(condition))
-            {
-                return NotFound();
-            }
-
             var conditionEntry = Context.ConditionSettings.FirstOrDefault(c => c.ConditionName == condition);
             if (conditionEntry == null)
             {
@@ -67,15 +68,14 @@ namespace CheckerApi.Controllers
             return Ok(enabled);
         }
 
+        [AuthenticateFilter]
         [HttpGet]
-        [Route("testnotifications/{password?}")]
-        public IActionResult TestNotifications(string password = "")
+        [Route("testnotifications/{password}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public IActionResult TestNotifications(string password)
         {
-            if (Password != password)
-            {
-                return NotFound();
-            }
-
             var notification = ServiceProvider.GetService<INotificationManager>();
             var result = notification.TriggerHook("Manual notification test, please ignore");
             if (result.HasFailed())
@@ -86,15 +86,14 @@ namespace CheckerApi.Controllers
             return Ok();
         }
 
+        [AuthenticateFilter]
         [HttpGet]
-        [Route("clearconditions/{password?}")]
-        public IActionResult ClearConditionsCache(string password = "")
+        [Route("clearconditions/{password}")]
+        [ProducesResponseType(typeof(IEnumerable<ConditionSetting>), 200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(404)]
+        public IActionResult ClearConditionsCache(string password)
         {
-            if (Password != password)
-            {
-                return NotFound();
-            }
-
             var conditions = Context.ConditionSettings.ToList();
             Context.ConditionSettings.RemoveRange(conditions);
             Context.SaveChanges();

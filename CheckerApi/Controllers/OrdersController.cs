@@ -24,6 +24,7 @@ namespace CheckerApi.Controllers
 
         [HttpGet]
         [Route("{top?}")]
+        [ProducesResponseType(typeof(List<BidAudit>), 200)]
         public IActionResult GetAlertOrders(int top = 10)
         {
             return Ok(Context.DataReadOnly.OrderByDescending(i => i.RecordDate).Take(top).ToList());
@@ -31,6 +32,7 @@ namespace CheckerApi.Controllers
 
         [HttpGet]
         [Route("audit.csv")]
+        [ProducesResponseType(typeof(List<BidAudit>), 200)]
         public IActionResult GetAuditOrdersCsv([FromQuery]string from, [FromQuery]string to, [FromQuery] string id, [FromQuery]int top = 1000)
         {
             var data = GetAudits(from, to, id, top).ToCsv();
@@ -42,6 +44,7 @@ namespace CheckerApi.Controllers
 
         [HttpGet]
         [Route("audit")]
+        [ProducesResponseType(typeof(List<BidAudit>), 200)]
         public IActionResult GetAuditOrders([FromQuery]string from, [FromQuery]string to, [FromQuery] string id, [FromQuery]int top = 1000)
         {
             var data = GetAudits(from, to, id, top);
@@ -50,6 +53,7 @@ namespace CheckerApi.Controllers
 
         [HttpGet]
         [Route("audit.zip")]
+        [ProducesResponseType(typeof(List<BidAudit>), 200)]
         public IActionResult Zip([FromQuery]string from, [FromQuery]string to, [FromQuery] string id, [FromQuery]int top = 1000)
         {
             var data = GetAudits(from, to, id, top).ToCsv();
