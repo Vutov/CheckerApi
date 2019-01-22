@@ -4,8 +4,10 @@ using System.Linq;
 using System.Reflection;
 using CheckerApi.Models.Entities;
 using CheckerApi.Models.Responses;
+using CheckerApi.Utils;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CheckerApi.Controllers
@@ -32,13 +34,17 @@ namespace CheckerApi.Controllers
                 .Select(c => $"{c.ConditionName} ({c.Enabled})")
                 .ToList();
 
+            var cache = ServiceProvider.GetService<IMemoryCache>();
+            cache.TryGetValue<double>(Constants.HashRateKey, out var networkRate);
+
             return Ok(new BotStatusResponse
             {
                 Status = "Running",
                 FoundOrders = Context.DataReadOnly.Count(),
                 AuditCount = Context.OrdersAuditsReadOnly.Count(),
                 Config = settings.Select(s => $"{s.Name} ({s.GetValue(Context.ConfigurationReadOnly)})"),
-                Conditions = conditions
+                Conditions = conditions,
+                StoredNetworkRate = networkRate
             });
         }
 

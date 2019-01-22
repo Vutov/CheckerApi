@@ -9,5 +9,6 @@ namespace CheckerApi.Models.Responses
         public int AuditCount { get; set; }
         public IEnumerable<string> Config { get; set; }
         public List<string> Conditions { get; set; }
+        public double StoredNetworkRate { get; set; }
     }
 }
