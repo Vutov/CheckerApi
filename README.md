@@ -3,7 +3,7 @@
 ## Purpose
 The Bot is designed to monitor NiceHash API for bids and send IFTTT notifications if the predefined conditions are met.
 
-The Bot is .Net Core 2.1 API using Entity Framework(EF) to connect to MySql. The EF creates the Database (DB) with the needed tables, columns, indexes and so on.
+The Bot is .Net Core 2.2 API using Entity Framework(EF) to connect to MySql. The EF creates the Database (DB) with the needed tables, columns, indexes and so on.
 
 ## Repo 
 https://github.com/Vutov/CheckerApi
@@ -53,6 +53,15 @@ Start the bot - ‘dotnet run’
       },
       "ClearAuditMinutes":1000000
    },
+   "NiceHash": {
+    "Url": "https://api.nicehash.com/",
+    "Request": "api?method=orders.get&location={location}&algo=36",
+    "Locations": [ 0, 1 ]
+   },
+   "Pool" : {
+    "Url": null,
+    "Request":  null 
+   },
    "Kestrel":{  
       "Certificates":{  
          "Default":{  
@@ -97,6 +106,8 @@ Note: Kestrel is not made for Production use, it does support https, but its goo
 
 >*Conditions* - show current conditions and are they enabled
 
+*{url}/swagger* - shows Swagger UI
+
 *{url}/version* - shows the last boot, environment and name
 
 *{url}/testnotifications/{password}* - send test notification to verify the flow works
@@ -124,6 +135,8 @@ Note: Kestrel is not made for Production use, it does support https, but its goo
 
 *{url}/acceptedpercentthreshold/{value}/{password}* - sets {value} for AcceptedPercentThreshold
 
+*{url}/totalhashthreshold/{value}/{password}* - sets {value} for TotalHashThreshold
+
 *{url}/enableaudit/{value}/{password}* - sets {value} for EnableAudit / ‘true’ or ‘false’ with words
 
 *{url}/condition/AcceptedSpeedCondition/{value}/{password}* - sets {value} for AcceptedSpeedCondition
@@ -131,6 +144,10 @@ Note: Kestrel is not made for Production use, it does support https, but its goo
 *{url}/condition/SignOfAttackCondition/{value}/{password}* - sets {value} for SignOfAttackCondition
 
 *{url}/condition/PercentThresholdCondition/{value}/{password}* - sets {value} for PercentThresholdCondition
+
+*{url}/condition/TotalMarketCondition/{value}/{password}* - sets {value} for TotalMarketCondition
+
+*{url}/condition/CriticalTotalMarketCondition/{value}/{password}* - sets {value} for CriticalTotalMarketCondition
 
 >urls are not case sensitive, value is ‘true’ or ‘false’
 {password} - its set in the config under password field.
@@ -145,7 +162,13 @@ Note: Kestrel is not made for Production use, it does support https, but its goo
 
 **Suspicious percentage order** - alert if any order has no limit or a limit greater than {limitspeed} AND its price is above the price of the Benchmark order* sorted by price AND accepted speed is above {minimalAcceptedSpeed}. (Reason: this provides an improved rubric for what defines a “high” price to avoid false alerts during times when the active order book spread is naturally tight or the order book has an unusual distribution.)
 
-**Benchmark orde**r is the order after which the sum of accepted speed for sorted-by-price orders is more than the {percent} of total accepted speed for the batch of orders. For example, if the threshold percentage is 90%, and the total Accepted Speed (hashpower delivered) of all orders is 1000 (i.e., 1000 units of power are being delivered across all actives order), and we count up from the lowest-priced order until we account for a total 900 Accepted Speed, the price of the next unit of power delivered is the Benchmark order price because 90% of the power being delivered is purchased at a lower price, and prices over this Benchmark are considered “high.”
+**Benchmark order** is the order after which the sum of accepted speed for sorted-by-price orders is more than the {percent} of total accepted speed for the batch of orders. For example, if the threshold percentage is 90%, and the total Accepted Speed (hashpower delivered) of all orders is 1000 (i.e., 1000 units of power are being delivered across all actives order), and we count up from the lowest-priced order until we account for a total 900 Accepted Speed, the price of the next unit of power delivered is the Benchmark order price because 90% of the power being delivered is purchased at a lower price, and prices over this Benchmark are considered “high.”
+
+**Total Market** - alert if the total market orders (all markets combined) accepted speed is above {totalhashthreshold} percentage of current network rate (taken from pool). Calculation formula *Sum(all active orders' accepted speed) * 1 000 000 * {totalhashthreshold} >= {networkrate}*
+
+**Critical Total Market** - alert if the total market orders (all markets combined) accepted speed is above current network rate (taken from pool). Calculation formula *Sum(all active orders' accepted speed) * 1 000 000 >= {networkrate}*
+
+Note: If Critical Total Market Condition alert is sent Total Market Condition will not be send
 
 ## Notifications
 
@@ -154,6 +177,10 @@ Note: Kestrel is not made for Production use, it does support https, but its goo
 **Suspicious order alert** - an attack might develop soon
 
 **Suspicious order progress** - less information for suspicious order that is still active
+
+**Total Market alert** - the network can be attacked, offered hash rate is close to the network's hash rate
+
+**Critical Total Market alert** - offered hash rate is over the network's hash rate, it is quite possible to buy an attack
 
 **Test notification** - ignore
 
@@ -165,18 +192,39 @@ Api with background thread checking the NiceHash API every 30 seconds. NiceHash 
 ## Details
 The data is gettered from https://api.nicehash.com/api?method=orders.get&location={location}&algo=24 , where location is 0 or 1 (EU and US). Once the data is available it is run against the predefined conditions using set of properties of the bid. The bid is checked if is Active, for Large Order is used accepted_speed, for suspicious bid is used limit_speed and price (more details about the condition logic in Condition section). Found orders are stored in MySql for future analisys. Trigger is sent to http://maker.ifttt.com/trigger/ for each order. IFTTT aplet then handles the webhook.
 
-Auto-registry of Conditions. - Using the attribute - [Condition(10)] with giving priority value and inheriting Condition abstract class will automaticly register the condition in the DB on startup, enable it and start checking against it.
+Auto-registry of Conditions. Currently there are 2 types of conditions - for market or for all markets - Using the attribute - [Condition(10)] or [GlobalCondition(4)]with giving priority value and inheriting Condition abstract class will automaticly register the condition in the DB on startup, enable it and start checking against it.
 
 Priority of the condition - one order can match multiple conditions, to avoid multiple entries in the db and multiple alerts for the same order we use priority. It means that the alert message with be for the condition with bigger (smaller number) priority. Example - If Large order has bigger priority then bid percentage - the message sent in the alert will be for Large Order, not percentage bid.
 
 Entity Framework Entities - Currently there is no Reposity pattern, DBContext is used with the DBSets. There are 2 types of DBSets - ‘normal’ ones and with the sufix ReadOnly. Second have detached entities and any change to them will not be affected in the DB, unless attached back before the save.
 
 .NET Quartz - Job Scheduler, Jobs:
+
 -Pull job - is used to schedule every 30 seconds pull of data from NiceHash API and an other job again every 30 seconds to clean the DB of old audits (older then 30 hours).
--Cleaner job - Currently using Inline SQL to do the Delete of old audit rows (older then 25 hours), it handles 1mil rows in 10secs or so. Job is run every 30 secs to keep the data low. -
+
+-Cleaner job - Currently using Inline SQL to do the Delete of old audit rows (older then 25 hours), it handles 1mil rows in 10secs or so. Job is run every 30 secs to keep the data low. 
+
 -Zip job - Run once a day at 24:00 to zip all audits of the previous day (00:00:00 - 23:59:59) in /AuditZips folder.
 
+-NetworkHashrateJob - Run once every 5 minutes and gathers network rate from a pool. If no pool is nofigured in appsettings the job will not start.
+
 ## Releases:
+1.2.0.0 - 25.01.2019
+```
+Added Total Market Condition and Critical Total Market Condition
+
+Introduced Global Condition - combining all markets and doing the condition on top
+
+Extracted URLs to appsettings
+
+Upgraded to Core 2.2
+
+Added Swagger
+
+Minor bug fixes
+
+Minor code refactoring
+```
 1.1.7.0 - 18.06.2018
 ```
 Added HSTS and upgrade on the way to use SSL with Cert.
