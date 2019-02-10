@@ -24,7 +24,12 @@ namespace CheckerApi.Jobs
             var result = JsonConvert.DeserializeObject<HashrateDTO>(response.Content);
 
             var cache = serviceProvider.GetService<IMemoryCache>();
-            cache.Set(Constants.HashRateKey, result.Pool.NetworkStats.Rate);
+            var networkRate = result.Pool.NetworkStats.Rate;
+            if (networkRate > 0)
+            {
+                var networkRateInMh = networkRate / 1000000; // in Mh/s
+                cache.Set(Constants.HashRateKey, networkRateInMh);
+            }
         }
     }
 }

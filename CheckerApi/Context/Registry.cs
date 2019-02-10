@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Reflection;
 using CheckerApi.Services.Conditions;
+using CheckerApi.Services.Interfaces;
+using ServiceStack;
 
 namespace CheckerApi.Context
 {
@@ -16,6 +18,24 @@ namespace CheckerApi.Context
                 {
                     var attribs = type.GetCustomAttributes(typeof(ConditionAttribute), false);
                     if (attribs != null && attribs.Length > 0)
+                    {
+                        conditions.Add(type);
+                    }
+                }
+            }
+
+            return conditions;
+        }
+
+        public static IEnumerable<Type> GetHeartbeats()
+        {
+            var conditions = new List<Type>();
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                foreach (Type type in assembly.GetTypes())
+                {
+                    var isHeartbeat = type.HasInterface(typeof(IHeartbeat));
+                    if (isHeartbeat)
                     {
                         conditions.Add(type);
                     }

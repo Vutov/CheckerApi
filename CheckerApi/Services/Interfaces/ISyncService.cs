@@ -4,6 +4,8 @@ namespace CheckerApi.Services.Interfaces
 {
     public interface ISyncService
     {
-        Result Run();
+        Result RunSync();
+
+        Result RunHeartbeat();
     }
 }

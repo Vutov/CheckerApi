@@ -6,12 +6,12 @@ using Quartz;
 namespace CheckerApi.Jobs
 {
     [DisallowConcurrentExecution]
-    public class SyncJob : Job
+    public class HeartbeatJob : Job
     {
         public override void Execute(JobDataMap data, IServiceProvider serviceProvider)
         {
             var service = serviceProvider.GetService<ISyncService>();
-            service.RunSync();
+            service.RunHeartbeat();
         }
     }
 }

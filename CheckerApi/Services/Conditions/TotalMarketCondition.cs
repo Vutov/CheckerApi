@@ -25,16 +25,17 @@ namespace CheckerApi.Services.Conditions
             var foundOrders = new List<AlertDTO>();
             var aliveOrders = orders.Where(o => o.Alive).ToList();
             var totalOrderHash = aliveOrders.Sum(o => o.AcceptedSpeed);
+            var niceHashRateInMh = totalOrderHash * 1000; // in Mh/s
 
             var cache = ServiceProvider.GetService<IMemoryCache>();
-            var hasRate = cache.TryGetValue<double>(Constants.HashRateKey, out var networkRate);
+            var hasRate = cache.TryGetValue<double>(Constants.HashRateKey, out var networkRateInMh);
 
-            if (hasRate && totalOrderHash * 1000000 * threshold >= networkRate)
+            if (hasRate && niceHashRateInMh * threshold >= networkRateInMh)
             {
                 string condition = $"Condition: " +
-                                  $"Active Orders Hash ({totalOrderHash * 1000000:F2}) above or equal to " +
-                                  $"{threshold * 100:F2}% of " +
-                                  $"Total Network Hash ({networkRate:F2}) ";
+                                  $"Active Orders Hash ({niceHashRateInMh:F2} Mh/s) above or equal to " +
+                                  $"{threshold * 100:F2}% (actual {niceHashRateInMh / networkRateInMh * 100:F2}%) of " +
+                                  $"Total Network Hash ({networkRateInMh:F2}) Mh/s ";
                 string message = $"{MessagePrefix}Market Total Threshold ALERT - 'AT RISK'. ";
 
                 foundOrders.Add(new AlertDTO()

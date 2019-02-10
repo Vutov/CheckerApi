@@ -43,6 +43,13 @@ namespace CheckerApi
                             .RepeatForever()
                         ),
                         startAt: DateTime.UtcNow.EndOfDay()
+                    ).AddJob<HeartbeatJob>(
+                        host,
+                        tb => tb.WithSimpleSchedule(x => x
+                            .WithIntervalInHours(24)
+                            .RepeatForever()
+                        ),
+                        startAt: DateTime.UtcNow.EndOfDay()
                     );
 
                     using (var serviceScope = host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
@@ -79,7 +86,7 @@ namespace CheckerApi
                 .UseSerilog((hostingContext, loggerConfiguration) =>
                 {
                     loggerConfiguration
-                        .MinimumLevel.Verbose()
+                        .MinimumLevel.Error()
                         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                         .MinimumLevel.Override("Quartz", LogEventLevel.Warning)
                         .Enrich.FromLogContext()
@@ -89,7 +96,9 @@ namespace CheckerApi
 
                     if (hostingContext.HostingEnvironment.IsDevelopment())
                     {
-                        loggerConfiguration.WriteTo.File("./errorlogs.txt", LogEventLevel.Error);
+                        loggerConfiguration
+                            .MinimumLevel.Verbose()
+                            .WriteTo.File("./errorlogs.txt", LogEventLevel.Error);
                     }
 
                     SelfLog.Enable(Console.Error);

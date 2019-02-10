@@ -48,26 +48,13 @@ namespace CheckerApi.Services
             _locations = config.GetSection("NiceHash:Locations").Get<int[]>();
         }
 
-        public Result Run()
+        public Result RunSync()
         {
             try
             {
                 var config = _context.ConfigurationReadOnly;
                 var settings = _context.ConditionSettingsReadOnly.ToList();
-                var totalOrders = new List<List<BidEntry>>();
-
-                foreach (var location in _locations)
-                {
-                    var client = new RestClient(_url);
-                    var request = new RestRequest(_request.Replace("{location}", location.ToString()), Method.GET);
-                    var response = client.Execute(request);
-                    var data = JsonConvert.DeserializeObject<ResultDTO>(response.Content);
-                    var orders = data.Result.Orders.Select(o => CreateDTO(o, location)).ToList();
-                    totalOrders.Add(orders);
-
-                    var auditOrders = orders.Where(o => o.Alive && o.AcceptedSpeed > 0).ToList();
-                    _audit.CreateAudit(auditOrders);
-                }
+                var totalOrders = GetTotalOrders(true);
 
                 var sw = Stopwatch.StartNew();
                 var foundOrders = _condition.Check(totalOrders, config, settings).ToList();
@@ -90,6 +77,53 @@ namespace CheckerApi.Services
                 _logger.LogError($"Sync failed: '{ex}'");
                 return Result.Fail(ex.Message);
             }
+        }
+
+        public Result RunHeartbeat()
+        {
+            try
+            {
+                var config = _context.ConfigurationReadOnly;
+                var settings = _context.ConditionSettingsReadOnly.ToList();
+                var totalOrders = this.GetTotalOrders(true);
+
+                var sw = Stopwatch.StartNew();
+                var heartbeats = _condition.GetHeartbeats(totalOrders, config, settings);
+                sw.Stop();
+                var elapsed = sw.Elapsed;
+                _logger.LogInformation($"Heartbeat took {elapsed.TotalSeconds} sec");
+
+                TriggerHeartbeat(heartbeats);
+
+                return Result.Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Sync failed: '{ex}'");
+                return Result.Fail(ex.Message);
+            }
+        }
+
+        private IEnumerable<List<BidEntry>> GetTotalOrders(bool enableAudit)
+        {
+            var totalOrders = new List<List<BidEntry>>();
+            foreach (var location in _locations)
+            {
+                var client = new RestClient(_url);
+                var request = new RestRequest(_request.Replace("{location}", location.ToString()), Method.GET);
+                var response = client.Execute(request);
+                var data = JsonConvert.DeserializeObject<ResultDTO>(response.Content);
+                var orders = data.Result.Orders.Select(o => CreateDTO(o, location)).ToList();
+                totalOrders.Add(orders);
+
+                if (enableAudit)
+                {
+                    var auditOrders = orders.Where(o => o.Alive && o.AcceptedSpeed > 0).ToList();
+                    _audit.CreateAudit(auditOrders);
+                }
+            }
+
+            return totalOrders;
         }
 
         private BidEntry CreateDTO(BidDTO order, int location)
@@ -115,6 +149,14 @@ namespace CheckerApi.Services
                 }
 
                 _notification.TriggerHook(alert.Message, alert.Condition, alertMessage);
+            }
+        }
+
+        private void TriggerHeartbeat(IEnumerable<(string, string, string)> heartbeats)
+        {
+            foreach (var heartbeat in heartbeats)
+            {
+                _notification.TriggerHeartbeat(heartbeat.Item1, heartbeat.Item2, heartbeat.Item3);
             }
         }
     }
