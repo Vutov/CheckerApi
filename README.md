@@ -45,6 +45,10 @@ Start the bot - ‘dotnet run’
       "Domain":"http://maker.ifttt.com/trigger/",
       "Uri":"test-alert/with/key/<>"
    },
+  "Heartbeat": {
+    "Domain": "http://maker.ifttt.com/trigger/",
+    "Uri": null
+  },
    "Api":{  
       "Password":null,
       "Alert":{  
@@ -189,6 +193,9 @@ Note: If Critical Total Market Condition alert is sent Total Market Condition wi
 ## Architecture of the bot
 Api with background thread checking the NiceHash API every 30 seconds. NiceHash Api updates every 30 seconds. If order is flagged by any of the conditions it is saved to MySql DB for further analysis. The API triggers IFTTT webhook, that can trigger other hooks for notifications via email, slack and others.
 
+## Heartbeat of conditions
+Optionally 'heartbeat' can be configured to trigger notification to different IFTTT trigger. The notification will be triggered only for Conditions that implement IHeartbeat and will occur once a day at 24:00. The heartbeat verifies the API is working and can give some meaningfull infomation. For example - the current Total Market alert progress - 'current exposure is 22,16%' 
+
 ## Details
 The data is gettered from https://api.nicehash.com/api?method=orders.get&location={location}&algo=24 , where location is 0 or 1 (EU and US). Once the data is available it is run against the predefined conditions using set of properties of the bid. The bid is checked if is Active, for Large Order is used accepted_speed, for suspicious bid is used limit_speed and price (more details about the condition logic in Condition section). Found orders are stored in MySql for future analisys. Trigger is sent to http://maker.ifttt.com/trigger/ for each order. IFTTT aplet then handles the webhook.
 
@@ -209,6 +216,12 @@ Entity Framework Entities - Currently there is no Reposity pattern, DBContext is
 -NetworkHashrateJob - Run once every 5 minutes and gathers network rate from a pool. If no pool is nofigured in appsettings the job will not start.
 
 ## Releases:
+1.2.1.0 - 15.02.2019
+```
+Added Heartbeat for conditions
+
+Bug fixes
+```
 1.2.0.0 - 25.01.2019
 ```
 Added Total Market Condition and Critical Total Market Condition
