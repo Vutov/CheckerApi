@@ -42,14 +42,14 @@ namespace CheckerApi
                             .WithIntervalInHours(24)
                             .RepeatForever()
                         ),
-                        startAt: DateTime.UtcNow.EndOfDay()
+                        startAt: DateTimeOffset.UtcNow.EndOfDay()
                     ).AddJob<HeartbeatJob>(
                         host,
                         tb => tb.WithSimpleSchedule(x => x
                             .WithIntervalInHours(24)
                             .RepeatForever()
                         ),
-                        startAt: DateTime.UtcNow.EndOfDay()
+                        startAt: DateTimeOffset.UtcNow.EndOfDay()
                     );
 
                     using (var serviceScope = host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
