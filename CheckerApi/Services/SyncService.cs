@@ -113,12 +113,12 @@ namespace CheckerApi.Services
                 var request = new RestRequest(_request.Replace("{location}", location.ToString()), Method.GET);
                 var response = client.Execute(request);
                 var data = JsonConvert.DeserializeObject<ResultDTO>(response.Content);
-                var orders = data.Result.Orders.Select(o => CreateDTO(o, location)).ToList();
+                var orders = data.Result?.Orders?.Select(o => CreateDTO(o, location)).ToList();
                 totalOrders.Add(orders);
 
                 if (enableAudit)
                 {
-                    var auditOrders = orders.Where(o => o.Alive && o.AcceptedSpeed > 0).ToList();
+                    var auditOrders = orders?.Where(o => o.Alive && o.AcceptedSpeed > 0).ToList();
                     _audit.CreateAudit(auditOrders);
                 }
             }
