@@ -67,6 +67,19 @@ namespace CheckerApi
                                 startAt: DateTimeOffset.UtcNow.AddSeconds(5)
                             );
                         }
+
+                        var monitorEnabled = config.GetValue<bool>("Monitor:Enable");
+                        if (monitorEnabled)
+                        {
+                            scheduler.AddJob<PoolPullJob>(
+                                host,
+                                tb => tb.WithSimpleSchedule(x => x
+                                    .WithIntervalInSeconds(30)
+                                    .RepeatForever()
+                                ),
+                                startAt: DateTimeOffset.UtcNow.AddSeconds(3)
+                            );
+                        }
                     }
                 })
                 .Run();

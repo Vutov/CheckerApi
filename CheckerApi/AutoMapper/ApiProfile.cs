@@ -23,6 +23,12 @@ namespace CheckerApi.AutoMapper
 
             CreateMap<BidEntry, BidAudit>()
                 ;
+
+            CreateMap<PoolHashrate, PoolHashrateDTO>()
+                .ForMember(
+                    dest => dest.Date,
+                    opt => opt.MapFrom(src => src.EntryDate))
+                ;
         }
     }
 }

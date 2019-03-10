@@ -21,7 +21,7 @@ namespace CheckerApi.UnitTests.Services.Conditions
         {
             _serviceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
             _cache = new Mock<IMemoryCache>(MockBehavior.Strict);
-            object value = 10000000d;
+            object value = 10000d;
             _cache.Setup(s => s.TryGetValue(Constants.HashRateKey, out value)).Returns(true);
             _serviceProvider.Setup(x => x.GetService(typeof(IMemoryCache)))
                 .Returns(_cache.Object);
