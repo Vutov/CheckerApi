@@ -75,10 +75,16 @@ namespace CheckerApi.Services.Conditions
         private double GetDelta(IGrouping<string, PoolHashrate> poolHashrates)
         {
             var sorted = poolHashrates.OrderBy(v => v.EntryDate).Select(v => v.Value).ToList();
-            var min = sorted.Min();
-            var max = sorted.Max();
+            var min = sorted.First();
+            var max = sorted.Last();
 
-            return max - min;
+            var delta = max - min;
+            if (delta > 0)
+            {
+                return delta;
+            }
+
+            return 0;
         }
     }
 }
