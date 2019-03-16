@@ -18,7 +18,7 @@ namespace CheckerApi.Services
             _serviceProvider = serviceProvider;
         }
 
-        public IEnumerable<AlertDTO> Check(IEnumerable<IEnumerable<BidEntry>> orders, ApiConfiguration config, IEnumerable<ConditionSetting> settings)
+        public IEnumerable<AlertDTO> Check(IEnumerable<IEnumerable<BidEntry>> orders, ApiConfiguration config, IEnumerable<ConditionSetting> settings, IEnumerable<PoolHashrate> poolData)
         {
             var foundOrders = new List<AlertDTO>();
             var foundOrdersIDs = new HashSet<string>();
@@ -33,13 +33,13 @@ namespace CheckerApi.Services
                     ICondition condition = (ICondition) Activator.CreateInstance(conditionEntry, args: _serviceProvider);
                     if (conditionEntry.IsDefined(typeof(GlobalConditionAttribute), false))
                     {
-                        data = condition.Compute(orders.SelectMany(o => o), config).ToList();
+                        data = condition.Compute(orders.SelectMany(o => o), config, poolData).ToList();
                     }
                     else
                     {
                         foreach (var order in orders)
                         {
-                            data.AddRange(condition.Compute(order, config));
+                            data.AddRange(condition.Compute(order, config, poolData));
                         }
                     }
 

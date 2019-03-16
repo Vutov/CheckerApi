@@ -19,7 +19,7 @@ namespace CheckerApi.Services.Conditions
         protected double? TotalHashThreshold { get; set; }
         protected string MessagePrefix { get; set; } = string.Empty;
 
-        public override IEnumerable<AlertDTO> Compute(IEnumerable<BidEntry> orders, ApiConfiguration config)
+        public override IEnumerable<AlertDTO> Compute(IEnumerable<BidEntry> orders, ApiConfiguration config, IEnumerable<PoolHashrate> poolData)
         {
             var threshold = TotalHashThreshold ?? config.TotalHashThreshold;
             var foundOrders = new List<AlertDTO>();
@@ -33,9 +33,10 @@ namespace CheckerApi.Services.Conditions
             if (hasRate && niceHashRateInMh * threshold >= networkRateInMh)
             {
                 string condition = $"Condition: " +
-                                  $"Active Orders Hash ({niceHashRateInMh:F2} Mh/s) above or equal to " +
-                                  $"{threshold * 100:F2}% (actual {niceHashRateInMh / networkRateInMh * 100:F2}%) of " +
-                                  $"Total Network Hash ({networkRateInMh:F2}) Mh/s ";
+                                   $"Active Orders Hash ({niceHashRateInMh:F2} Mh/s) above or equal to " +
+                                   $"{threshold * 100:F2}% (actual {niceHashRateInMh / networkRateInMh * 100:F2}%) of " +
+                                   $"Total Network Hash ({networkRateInMh:F2}) Mh/s " +
+                                   $"{this.AnalyzePools(poolData, niceHashRateInMh)}";
                 string message = $"{MessagePrefix}Market Total Threshold ALERT - 'AT RISK'. ";
 
                 foundOrders.Add(new AlertDTO()
@@ -47,6 +48,37 @@ namespace CheckerApi.Services.Conditions
             }
 
             return foundOrders;
+        }
+
+        private string AnalyzePools(IEnumerable<PoolHashrate> poolData, double networkSpike)
+        {
+            var data = poolData
+                .Where(d => d.EntryDate > DateTime.UtcNow.AddMinutes(-15)) // take last 15 min
+                .GroupBy(h => h.Name)
+                .ToDictionary(
+                    k => k.Key,
+                    this.GetDelta
+                );
+
+            var sum = data.Sum(d => d.Value);
+            var message = string.Empty;
+            var displacement = sum / networkSpike;
+            if (displacement > 0.3d)
+            {
+                message = $"Pool Analysis - {displacement * 100:F4}% located in tracked pools; Top 3 pools ";
+                data.OrderByDescending(d => d.Value).Take(3).ToList().ForEach(d => message += $"'{d.Key}' : {d.Value:F6} Mh/s; ");
+            }
+
+            return message;
+        }
+
+        private double GetDelta(IGrouping<string, PoolHashrate> poolHashrates)
+        {
+            var sorted = poolHashrates.OrderBy(v => v.EntryDate).Select(v => v.Value).ToList();
+            var min = sorted.Min();
+            var max = sorted.Max();
+
+            return max - min;
         }
     }
 }

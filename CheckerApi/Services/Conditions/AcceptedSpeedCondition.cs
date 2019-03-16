@@ -15,7 +15,7 @@ namespace CheckerApi.Services.Conditions
         {
         }
 
-        public override IEnumerable<AlertDTO> Compute(IEnumerable<BidEntry> orders, ApiConfiguration config)
+        public override IEnumerable<AlertDTO> Compute(IEnumerable<BidEntry> orders, ApiConfiguration config, IEnumerable<PoolHashrate> poolData)
         {
             var foundOrders = new List<AlertDTO>();
             foreach (var order in orders)

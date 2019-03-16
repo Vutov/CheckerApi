@@ -6,5 +6,6 @@ namespace CheckerApi.Models.DTO
     {
         public double Value { get; set; }
         public DateTime Date { get; set; }
+        public string Denomination { get; set; }
     }
 }

@@ -2,8 +2,19 @@
 {
     public enum Denomination
     {
-        Msol,
+        /// <summary>
+        /// Denomination Sol
+        /// </summary>
+        Sol,
+
+        /// <summary>
+        /// Denomination KSol
+        /// </summary>
         Ksol,
-        Gsol
+
+        /// <summary>
+        /// Denomination MSol
+        /// </summary>
+        Msol,
     }
 }

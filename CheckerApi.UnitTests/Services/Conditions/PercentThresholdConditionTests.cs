@@ -32,7 +32,7 @@ namespace CheckerApi.UnitTests.Services.Conditions
             };
 
             // Act
-            var data = complier.Compute(GetSignBidSet(id), config);
+            var data = complier.Compute(GetSignBidSet(id), config, new List<PoolHashrate>());
 
             // Assert
             Assert.IsFalse(data.Any());
@@ -56,7 +56,7 @@ namespace CheckerApi.UnitTests.Services.Conditions
             };
 
             // Act
-            var data = complier.Compute(orders, config).OrderBy(o => o.BidEntry.NiceHashId).ToList();
+            var data = complier.Compute(orders, config, new List<PoolHashrate>()).OrderBy(o => o.BidEntry.NiceHashId).ToList();
 
             // Asserts
             Assert.AreEqual(2, data.Count());
@@ -83,8 +83,8 @@ namespace CheckerApi.UnitTests.Services.Conditions
             };
 
             // Act
-            var data = complier.Compute(orders, config);
-            var data1 = complier.Compute(orders, config);
+            var data = complier.Compute(orders, config, new List<PoolHashrate>());
+            var data1 = complier.Compute(orders, config, new List<PoolHashrate>());
 
             // Assert
             Assert.AreEqual(1, data.Count());

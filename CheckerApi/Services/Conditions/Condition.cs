@@ -24,7 +24,7 @@ namespace CheckerApi.Services.Conditions
 
         protected IServiceProvider ServiceProvider { get; set; }
 
-        public abstract IEnumerable<AlertDTO> Compute(IEnumerable<BidEntry> orders, ApiConfiguration config);
+        public abstract IEnumerable<AlertDTO> Compute(IEnumerable<BidEntry> orders, ApiConfiguration config, IEnumerable<PoolHashrate> poolData);
 
         protected string CreateSignSignature(BidEntry entry)
         {

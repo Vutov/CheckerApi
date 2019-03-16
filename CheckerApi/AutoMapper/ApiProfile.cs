@@ -1,5 +1,6 @@
 ﻿using System;
 using AutoMapper;
+using CheckerApi.Models.Config;
 using CheckerApi.Models.DTO;
 using CheckerApi.Models.Entities;
 
@@ -28,6 +29,12 @@ namespace CheckerApi.AutoMapper
                 .ForMember(
                     dest => dest.Date,
                     opt => opt.MapFrom(src => src.EntryDate))
+                .ForMember(
+                    dest => dest.Value,
+                    opt => opt.MapFrom(src => src.Value * 1000)) // To KSol
+                .ForMember(
+                    dest => dest.Denomination,
+                    opt => opt.MapFrom(src => Denomination.Ksol.ToString()))
                 ;
         }
     }

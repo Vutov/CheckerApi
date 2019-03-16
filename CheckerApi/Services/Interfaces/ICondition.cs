@@ -6,6 +6,6 @@ namespace CheckerApi.Services.Interfaces
 {
     public interface ICondition
     {
-        IEnumerable<AlertDTO> Compute(IEnumerable<BidEntry> orders, ApiConfiguration config);
+        IEnumerable<AlertDTO> Compute(IEnumerable<BidEntry> orders, ApiConfiguration config, IEnumerable<PoolHashrate> poolData);
     }
 }
