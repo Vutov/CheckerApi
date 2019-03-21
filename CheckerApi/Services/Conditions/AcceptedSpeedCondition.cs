@@ -35,7 +35,8 @@ namespace CheckerApi.Services.Conditions
                         BidEntry = order,
                         Condition = $"Condition: " +
                                     $"Order Alive ({order.Alive}) AND " +
-                                    $"Order Accepted Speed ({order.AcceptedSpeed}) >= '{config.AcceptedSpeed}'. ",
+                                    $"Order Accepted Speed ({order.AcceptedSpeed}) >= '{config.AcceptedSpeed}'. " +
+                                    $"{this.CreateIsProfitableMessage(order.Price)} ",
                         Message = $"LARGE ORDER ALERT - possible attack in progress. {CreateMessage(order)}. "
                     });
                 }

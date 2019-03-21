@@ -41,6 +41,7 @@ namespace CheckerApi
             services.AddTransient<IAuditManager, AuditManager>();
             services.AddTransient<ICompressService, CompressService>();
             services.AddTransient<IPoolPullService, PoolPullService>();
+            services.AddTransient<IDataExtractorService, DataExtractorService>();
 
             services.AddMvc();
         }

@@ -27,8 +27,7 @@ namespace CheckerApi.Services.Conditions
             var totalOrderHash = aliveOrders.Sum(o => o.AcceptedSpeed);
             var niceHashRateInMh = totalOrderHash * 1000; // in Mh/s
 
-            var cache = ServiceProvider.GetService<IMemoryCache>();
-            var hasRate = cache.TryGetValue<double>(Constants.HashRateKey, out var networkRateInMh);
+            var hasRate = Cache.TryGetValue<double>(Constants.HashRateKey, out var networkRateInMh);
 
             if (hasRate && niceHashRateInMh * threshold >= networkRateInMh)
             {
@@ -36,6 +35,7 @@ namespace CheckerApi.Services.Conditions
                                    $"Active Orders Hash ({niceHashRateInMh:F2} Mh/s) above or equal to " +
                                    $"{threshold * 100:F2}% (actual {niceHashRateInMh / networkRateInMh * 100:F2}%) of " +
                                    $"Total Network Hash ({networkRateInMh:F2}) Mh/s " +
+                                   $"{this.CreateIsProfitableMessage(aliveOrders.Average(o => o.Price), "Average Price of ")} " +
                                    $"{this.AnalyzePools(poolData, niceHashRateInMh)}";
                 string message = $"{MessagePrefix}Market Total Threshold ALERT - 'AT RISK'. ";
 

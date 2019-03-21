@@ -10,5 +10,7 @@ namespace CheckerApi.Models.Responses
         public IEnumerable<string> Config { get; set; }
         public List<string> Conditions { get; set; }
         public double StoredNetworkRate { get; set; }
+        public double StoredNetworkDifficulty { get; set; }
+        public double StoredBtcBtgPrice { get; set; }
     }
 }
