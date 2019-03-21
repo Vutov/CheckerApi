@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Net;
 using System.Text.RegularExpressions;
 using CheckerApi.Context;
 using CheckerApi.Models;
@@ -44,12 +45,20 @@ namespace CheckerApi.Services
                     var client = new RestClient(pool.Url);
                     var request = new RestRequest(Method.GET);
                     var response = client.Execute(request);
+                    var content = response.Content;
+
                     if (!response.IsSuccessful)
                     {
-                        _logger.LogError($"PoolPull failed: URL:'{pool.Url}', err: '{response.Content}'");
+                        this.LogFailedApiCall(pool.Url, content);
+                        continue;
                     }
 
-                    var content = response.Content;
+                    if (response.StatusCode != HttpStatusCode.OK)
+                    {
+                        _logger.LogError($"PoolPull URL: '{pool.Url}' Status: '{response.StatusCode}'");
+                        continue;
+                    }
+
                     foreach (var pattern in pool.Coins)
                     {
                         var result = this.GetHashrateEntity(content, pattern);
@@ -105,6 +114,20 @@ namespace CheckerApi.Services
             catch (Exception ex)
             {
                 return Result<PoolHashrate>.Fail($"PoolPull parse failed Name: '{pattern.Name}', error: '{ex}'");
+            }
+        }
+
+        private void LogFailedApiCall(string url, string responseContent)
+        {
+            var log = $"PoolPull failed: URL:'{url}', err: '{responseContent}'";
+            if (string.IsNullOrEmpty(responseContent) || responseContent.ToUpper().Contains("<!DOCTYPE"))
+            {
+                // Most likely the API is down for maintanance, it is supposed to return JSON
+                _logger.LogTrace(log);
+            }
+            else
+            {
+                _logger.LogError(log);
             }
         }
     }
