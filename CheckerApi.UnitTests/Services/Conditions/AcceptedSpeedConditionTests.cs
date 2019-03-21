@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using CheckerApi.Models.Entities;
 using CheckerApi.Services.Conditions;
+using CheckerApi.Utils;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using NUnit.Framework;
 
@@ -12,11 +14,19 @@ namespace CheckerApi.UnitTests.Services.Conditions
     public class AcceptedSpeedConditionTests
     {
         private Mock<IServiceProvider> _serviceProvider;
+        private Mock<IMemoryCache> _cache;
 
         [SetUp]
         public void Setup()
         {
-            _serviceProvider = new Mock<IServiceProvider>();
+            _serviceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
+            _cache = new Mock<IMemoryCache>(MockBehavior.Strict);
+            object diff = 0d;
+            object network = 0d;
+            _cache.Setup(s => s.TryGetValue(Constants.DifficultyKey, out diff)).Returns(false);
+            _cache.Setup(s => s.TryGetValue(Constants.BtcBtgPriceKey, out network)).Returns(false);
+            _serviceProvider.Setup(x => x.GetService(typeof(IMemoryCache)))
+                .Returns(_cache.Object);
         }
 
         [TestCase(1)]

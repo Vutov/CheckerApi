@@ -87,7 +87,7 @@ namespace CheckerApi
                             scheduler.AddJob<PriceJob>(
                                 host,
                                 tb => tb.WithSimpleSchedule(x => x
-                                    .WithIntervalInMinutes(5)
+                                    .WithIntervalInMinutes(1)
                                     .RepeatForever()
                                 ),
                                 startAt: DateTimeOffset.UtcNow.AddSeconds(1)
