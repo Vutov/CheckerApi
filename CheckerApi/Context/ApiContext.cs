@@ -16,6 +16,7 @@ namespace CheckerApi.Context
         public DbSet<ApiConfiguration> Configurations { get; set; }
         public DbSet<ConditionSetting> ConditionSettings { get; set; }
         public DbSet<BidAudit> OrdersAudit { get; set; }
+        public DbSet<PoolHashrate> PoolHashrates { get; set; }
 
         public ApiConfiguration Configuration => Configurations.OrderBy(c => c.ID).FirstOrDefault();
 
@@ -23,6 +24,7 @@ namespace CheckerApi.Context
         public ApiConfiguration ConfigurationReadOnly => Configurations.AsNoTracking().OrderBy(c => c.ID).FirstOrDefault();
         public IQueryable<ConditionSetting> ConditionSettingsReadOnly => ConditionSettings.AsNoTracking();
         public IQueryable<BidAudit> OrdersAuditsReadOnly => OrdersAudit.AsNoTracking();
+        public IQueryable<PoolHashrate> PoolHashratesReadOnly => PoolHashrates.AsNoTracking();
 
         public void Seed()
         {

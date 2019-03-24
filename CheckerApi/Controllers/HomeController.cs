@@ -36,6 +36,8 @@ namespace CheckerApi.Controllers
 
             var cache = ServiceProvider.GetService<IMemoryCache>();
             cache.TryGetValue<double>(Constants.HashRateKey, out var networkRate);
+            cache.TryGetValue<double>(Constants.DifficultyKey, out var networkDifficulty);
+            cache.TryGetValue<double>(Constants.BtcBtgPriceKey, out var price);
 
             return Ok(new BotStatusResponse
             {
@@ -44,7 +46,9 @@ namespace CheckerApi.Controllers
                 AuditCount = Context.OrdersAuditsReadOnly.Count(),
                 Config = settings.Select(s => $"{s.Name} ({s.GetValue(Context.ConfigurationReadOnly)})"),
                 Conditions = conditions,
-                StoredNetworkRate = networkRate
+                StoredNetworkRate = networkRate,
+                StoredNetworkDifficulty = networkDifficulty,
+                StoredBtcBtgPrice = price
             });
         }
 

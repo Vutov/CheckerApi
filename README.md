@@ -66,6 +66,41 @@ Start the bot - ‘dotnet run’
     "Url": null,
     "Request":  null 
    },
+  "Pool": {
+    "Enable": false,
+    "Url": null,
+    "Request": null,
+    "Regex": null,
+    "Denomination": null
+  },
+  "Monitor": {
+    "Enable": false,
+    "StoreForMinutes": 30,
+    "Pools": [
+      {
+        "URL": "https://example.pool",
+        "Enabled": false,
+        "Coins": [
+          {
+            "Name": "example-btg",
+            "Pattern": "solo-btg.+?([0-9.]+),",
+            "Denomination": "sol"
+          },
+          {
+            "Name": "example-solo-btcz",
+            "Pattern": "solo-btcz.+?([0-9.]+),",
+            "Denomination": "sol"
+          }
+        ]
+      }
+    ]
+  },
+  "Price": {
+    "Enable": false,
+    "URL": "https://coinlib.io/",
+    "Request": null,
+    "Regex": "price.+?([0-9.]+)"
+  },
    "Kestrel":{  
       "Certificates":{  
          "Default":{  
@@ -153,6 +188,8 @@ Note: Kestrel is not made for Production use, it does support https, but its goo
 
 *{url}/condition/CriticalTotalMarketCondition/{value}/{password}* - sets {value} for CriticalTotalMarketCondition
 
+*{url}/PoolHashrate* - shows stored data for pool's hashrate (if such enabled and configured from appsettings)
+
 >urls are not case sensitive, value is ‘true’ or ‘false’
 {password} - its set in the config under password field.
 
@@ -172,7 +209,16 @@ Note: Kestrel is not made for Production use, it does support https, but its goo
 
 **Critical Total Market** - alert if the total market orders (all markets combined) accepted speed is above current network rate (taken from pool). Calculation formula *Sum(all active orders' accepted speed) * 1 000 000 >= {networkrate}*
 
-Note: If Critical Total Market Condition alert is sent Total Market Condition will not be send
+Note: 
+
+* If Critical Total Market Condition alert is sent Total Market Condition will not be send
+
+* If `Price` is configured each Condition will be enriched with price analysis. Example:
+>Price Analysis: Order is most likely FOR PROFIT. Paying Average Price of 1.855822 BTC, Revenue threshold 2.567179 BTC
+
+or
+
+>Price Analisys: Order is overpaying. Paying Average Price of 2,728290 BTC, Revenue threshold 2,061888 BTC
 
 ## Notifications
 
@@ -213,9 +259,23 @@ Entity Framework Entities - Currently there is no Reposity pattern, DBContext is
 
 -Zip job - Run once a day at 24:00 to zip all audits of the previous day (00:00:00 - 23:59:59) in /AuditZips folder.
 
--NetworkHashrateJob - Run once every 5 minutes and gathers network rate from a pool. If no pool is nofigured in appsettings the job will not start.
+-NetworkJob - Run once every 5 minutes and gathers network rate and difficulty from a pool. If not `enabled` - cofigured false in appsettings the job will not start.
+
+-Pool Monitor Job - Run once every 30 seconds and gathers reported hashrate from url. It has to be `enabled` and provided with url, regex to gather data and optionally denomination (sol, ksol, msol). If denomination is null, there has to be 2nd group in the regex for denomonation. See example of appsettings. This monitoring, if enabled, is used for Market Condition alerts to try to identify where the bought hashpower went.
+
+-Price Job - Run once every 1 minute and gathers BTC to BTG price.  It has to be `enabled` and provided with url, regex to gather data. See example of appsettings. This monitoring, if enabled, is used for all Conditions to identify is the alert is just 'hashrush' or geniune alert.
 
 ## Releases:
+1.2.2.0 - 24.03.2019
+```
+Added Monitoring of pools
+
+Added Price Analysis to the alert message
+
+Reworked how NetworkRate and Difficulty are gathered from a Pool 
+
+Major fixes on logs to have only "vital" errors
+```
 1.2.1.0 - 15.02.2019
 ```
 Added Heartbeat for conditions

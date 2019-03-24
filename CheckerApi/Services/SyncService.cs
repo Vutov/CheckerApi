@@ -55,9 +55,10 @@ namespace CheckerApi.Services
                 var config = _context.ConfigurationReadOnly;
                 var settings = _context.ConditionSettingsReadOnly.ToList();
                 var totalOrders = GetTotalOrders(true);
+                var poolData = _context.PoolHashratesReadOnly.ToList();
 
                 var sw = Stopwatch.StartNew();
-                var foundOrders = _condition.Check(totalOrders, config, settings).ToList();
+                var foundOrders = _condition.Check(totalOrders, config, settings, poolData).ToList();
                 sw.Stop();
                 var elapsed = sw.Elapsed;
                 _logger.LogInformation($"Conditions check took {elapsed.TotalSeconds} sec");
@@ -113,7 +114,7 @@ namespace CheckerApi.Services
                 var request = new RestRequest(_request.Replace("{location}", location.ToString()), Method.GET);
                 var response = client.Execute(request);
                 var data = JsonConvert.DeserializeObject<ResultDTO>(response.Content);
-                var orders = data.Result?.Orders?.Select(o => CreateDTO(o, location)).ToList();
+                var orders = data?.Result?.Orders?.Select(o => CreateDTO(o, location)).ToList() ?? new List<BidEntry>();
                 totalOrders.Add(orders);
 
                 if (enableAudit)

@@ -16,9 +16,14 @@ namespace CheckerApi.Jobs
 
             var recordThreshold = TimeSpan.FromMinutes(config.GetValue<int>("Api:ClearAuditMinutes"));
             var context = serviceProvider.GetService<ApiContext>();
-            var time = DateTime.UtcNow.Add(-recordThreshold);
+            var auditTime = DateTime.UtcNow.Add(-recordThreshold);
 
-            context.Database.ExecuteSqlCommand(new RawSqlString("DELETE FROM OrderAudits WHERE RecordDate <= @p0"), $"{time:s}");
+            context.Database.ExecuteSqlCommand(new RawSqlString("DELETE FROM OrderAudits WHERE RecordDate <= @p0"), $"{auditTime:s}");
+            context.SaveChanges();
+
+            var hashrateThreshold = TimeSpan.FromMinutes(config.GetValue<int>("Monitor:StoreForMinutes"));
+            var hashrateTime = DateTime.UtcNow.Add(-hashrateThreshold);
+            context.Database.ExecuteSqlCommand(new RawSqlString("DELETE FROM PoolHashrate WHERE EntryDate <= @p0"), $"{hashrateTime:s}");
             context.SaveChanges();
         }
     }

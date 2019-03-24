@@ -23,48 +23,74 @@ namespace CheckerApi
                 .SetupScheduler((scheduler, host) =>
                 {
                     scheduler.AddJob<SyncJob>(
-                        host,
-                        tb => tb.WithSimpleSchedule(x => x
-                            .WithIntervalInSeconds(30)
-                            .RepeatForever()
-                        ),
-                        startAt: DateTimeOffset.UtcNow.AddSeconds(15)
-                    ).AddJob<CleanerJob>(
-                        host,
-                        tb => tb.WithSimpleSchedule(x => x
-                            .WithIntervalInSeconds(30)
-                            .RepeatForever()
-                        ),
-                        startAt: DateTimeOffset.UtcNow.AddSeconds(30)
-                    ).AddJob<ZipJob>(
-                        host,
-                        tb => tb.WithSimpleSchedule(x => x
-                            .WithIntervalInHours(24)
-                            .RepeatForever()
-                        ),
-                        startAt: DateTimeOffset.UtcNow.EndOfDay()
-                    ).AddJob<HeartbeatJob>(
-                        host,
-                        tb => tb.WithSimpleSchedule(x => x
-                            .WithIntervalInHours(24)
-                            .RepeatForever()
-                        ),
-                        startAt: DateTimeOffset.UtcNow.EndOfDay()
-                    );
+                            host,
+                            tb => tb.WithSimpleSchedule(x => x
+                                .WithIntervalInSeconds(30)
+                                .RepeatForever()
+                            ),
+                            startAt: DateTimeOffset.UtcNow.AddSeconds(15)
+                        ).AddJob<CleanerJob>(
+                            host,
+                            tb => tb.WithSimpleSchedule(x => x
+                                .WithIntervalInSeconds(30)
+                                .RepeatForever()
+                            ),
+                            startAt: DateTimeOffset.UtcNow.AddSeconds(30)
+                        ).AddJob<ZipJob>(
+                            host,
+                            tb => tb.WithSimpleSchedule(x => x
+                                .WithIntervalInHours(24)
+                                .RepeatForever()
+                            ),
+                            startAt: DateTimeOffset.UtcNow.EndOfDay()
+                        ).AddJob<HeartbeatJob>(
+                            host,
+                            tb => tb.WithSimpleSchedule(x => x
+                                .WithIntervalInHours(24)
+                                .RepeatForever()
+                            ),
+                            startAt: DateTimeOffset.UtcNow.EndOfDay()
+                        );
 
                     using (var serviceScope = host.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
                     {
                         var config = serviceScope.ServiceProvider.GetService<IConfiguration>();
-                        var pool = config.GetValue<string>("Pool:Url");
-                        if (!string.IsNullOrEmpty(pool))
+                        var poolEnabled = config.GetValue<bool>("Pool:Enable");
+                        if (poolEnabled)
                         {
-                            scheduler.AddJob<NetworkHashrateJob>(
+                            scheduler.AddJob<NetworkJob>(
                                 host,
                                 tb => tb.WithSimpleSchedule(x => x
                                     .WithIntervalInMinutes(5)
                                     .RepeatForever()
                                 ),
                                 startAt: DateTimeOffset.UtcNow.AddSeconds(5)
+                            );
+                        }
+
+                        var monitorEnabled = config.GetValue<bool>("Monitor:Enable");
+                        if (monitorEnabled)
+                        {
+                            scheduler.AddJob<PoolPullJob>(
+                                host,
+                                tb => tb.WithSimpleSchedule(x => x
+                                    .WithIntervalInSeconds(30)
+                                    .RepeatForever()
+                                ),
+                                startAt: DateTimeOffset.UtcNow.AddSeconds(3)
+                            );
+                        }
+
+                        var priceEnabled = config.GetValue<bool>("Price:Enable");
+                        if (priceEnabled)
+                        {
+                            scheduler.AddJob<PriceJob>(
+                                host,
+                                tb => tb.WithSimpleSchedule(x => x
+                                    .WithIntervalInMinutes(1)
+                                    .RepeatForever()
+                                ),
+                                startAt: DateTimeOffset.UtcNow.AddSeconds(1)
                             );
                         }
                     }

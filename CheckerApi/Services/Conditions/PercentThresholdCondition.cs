@@ -15,7 +15,7 @@ namespace CheckerApi.Services.Conditions
         {
         }
 
-        public override IEnumerable<AlertDTO> Compute(IEnumerable<BidEntry> orders, ApiConfiguration config)
+        public override IEnumerable<AlertDTO> Compute(IEnumerable<BidEntry> orders, ApiConfiguration config, IEnumerable<PoolHashrate> poolData)
         {
             var foundOrders = new List<AlertDTO>();
             var aliveOrders = orders.Where(o => o.Alive).ToList();
@@ -59,7 +59,8 @@ namespace CheckerApi.Services.Conditions
                                    $"Order Alive ({order.Alive}) AND " +
                                    $"Order Price ({order.Price}) above '{benchmarkOrder.Price}' benchmark Order Price (ID: {benchmarkOrder.NiceHashId}) AND " +
                                    $"(Order Speed Limit ({order.LimitSpeed}) = 0 OR Order Speed Limit ({order.LimitSpeed}) >= '{config.LimitSpeed}') AND " +
-                                   $"Order Accepted Speed ({order.AcceptedSpeed}) >= {config.MinimalAcceptedSpeed}. ";
+                                   $"Order Accepted Speed ({order.AcceptedSpeed}) >= {config.MinimalAcceptedSpeed}. " +
+                                   $"{this.CreateIsProfitableMessage(order.Price)} ";
                         message = $"SUSPICIOUS BID Percentage ALERT - an attack may be about to begin. {CreateMessage(order)}. ";
                     }
                     else

@@ -21,7 +21,11 @@ namespace CheckerApi.UnitTests.Services.Conditions
         {
             _serviceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
             _cache = new Mock<IMemoryCache>(MockBehavior.Strict);
-            object value = 10000000d;
+            object value = 10000d;
+            object diff = 0d;
+            object network = 0d;
+            _cache.Setup(s => s.TryGetValue(Constants.DifficultyKey, out diff)).Returns(false);
+            _cache.Setup(s => s.TryGetValue(Constants.BtcBtgPriceKey, out network)).Returns(false);
             _cache.Setup(s => s.TryGetValue(Constants.HashRateKey, out value)).Returns(true);
             _serviceProvider.Setup(x => x.GetService(typeof(IMemoryCache)))
                 .Returns(_cache.Object);
@@ -40,7 +44,7 @@ namespace CheckerApi.UnitTests.Services.Conditions
             };
 
             // Act
-            var data = compiler.Compute(GetSignBidSet(id), config);
+            var data = compiler.Compute(GetSignBidSet(id), config, new List<PoolHashrate>());
 
             // Assert
             Assert.IsFalse(data.Any());
@@ -61,7 +65,7 @@ namespace CheckerApi.UnitTests.Services.Conditions
             };
 
             // Act
-            var data = compiler.Compute(orders, config).OrderBy(o => o.BidEntry.NiceHashId).ToList();
+            var data = compiler.Compute(orders, config, new List<PoolHashrate>()).OrderBy(o => o.BidEntry.NiceHashId).ToList();
 
             // Asserts
             Assert.AreEqual(1, data.Count());

@@ -5,7 +5,6 @@ using CheckerApi.Models.Entities;
 using CheckerApi.Services.Interfaces;
 using CheckerApi.Utils;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace CheckerApi.Services.Conditions
 {
@@ -23,8 +22,7 @@ namespace CheckerApi.Services.Conditions
             var aliveOrders = orders.Where(o => o.Alive).ToList();
             var totalOrderHash = aliveOrders.Sum(o => o.AcceptedSpeed);
 
-            var cache = ServiceProvider.GetService<IMemoryCache>();
-            var hasRate = cache.TryGetValue<double>(Constants.HashRateKey, out var networkRateInMh);
+            var hasRate = Cache.TryGetValue<double>(Constants.HashRateKey, out var networkRateInMh);
 
             var info = $"HEARTBEAT: {MessagePrefix}Market Total Threshold ";
             if (hasRate == false)
