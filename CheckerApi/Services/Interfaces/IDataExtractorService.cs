@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
+using CheckerApi.Models;
 
 namespace CheckerApi.Services.Interfaces
 {
     public interface IDataExtractorService
     {
-        IEnumerable<string> GetData(string url, string req, string pattern);
+        Result<IEnumerable<string>> GetData(string url, string req, string pattern);
     }
 }

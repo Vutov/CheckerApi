@@ -5,7 +5,6 @@ using CheckerApi.Models.Entities;
 using CheckerApi.Services.Interfaces;
 using CheckerApi.Utils;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace CheckerApi.Services.Conditions
 {
