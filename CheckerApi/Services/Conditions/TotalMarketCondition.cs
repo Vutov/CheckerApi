@@ -51,7 +51,7 @@ namespace CheckerApi.Services.Conditions
                         NiceHashId = "Aggregation",
                         NiceHashDataCenter = 0,
                         LimitSpeed = aliveOrders.Sum(o => o.LimitSpeed),
-                        AcceptedSpeed = aliveOrders.Sum(o => o.AcceptedSpeed),
+                        AcceptedSpeed = aliveOrders.Sum(o => o.AcceptedSpeed) * 1000, // in Mh/s
                     },
                     Condition = condition,
                     Message = message

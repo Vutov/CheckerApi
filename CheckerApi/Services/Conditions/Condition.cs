@@ -79,7 +79,7 @@ namespace CheckerApi.Services.Conditions
             {
                 var threshold = price * 131835937.5d / networkDifficulty;
                 var status = payingPrice > threshold ? "Order is overpaying" : "Order is most likely FOR PROFIT";
-                return $"Price Analysis: {status}. Paying {priceSummary}{payingPrice:F6} BTC, Revenue threshold {threshold:F6} BTC";
+                return $"Price Analysis: {status}. Paying {priceSummary}{payingPrice:F6} BTC, Revenue threshold {threshold:F6} BTC, Netowork Difficulty {networkDifficulty:F6}";
             }
 
             return $"Unsuficiant data for Price Analysis. Missing difficulty '{!hasDifficulty}', missing price '{!hasPrice}'";
