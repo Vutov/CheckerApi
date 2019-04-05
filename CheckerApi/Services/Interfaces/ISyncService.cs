@@ -10,7 +10,6 @@ namespace CheckerApi.Services.Interfaces
 
         Result RunHeartbeat();
 
-        // TODO Think how
         IEnumerable<List<BidEntry>> GetTotalOrders(bool enableAudit);
     }
 }
