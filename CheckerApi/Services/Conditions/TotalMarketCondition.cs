@@ -48,8 +48,10 @@ namespace CheckerApi.Services.Conditions
                         Algo = orders.FirstOrDefault()?.Algo,
                         Price = averagePrice,
                         Alive = true,
-                        NiceHashId = "0",
-                        NiceHashDataCenter = 0
+                        NiceHashId = "Aggregation",
+                        NiceHashDataCenter = 0,
+                        LimitSpeed = aliveOrders.Sum(o => o.LimitSpeed),
+                        AcceptedSpeed = aliveOrders.Sum(o => o.AcceptedSpeed),
                     },
                     Condition = condition,
                     Message = message
