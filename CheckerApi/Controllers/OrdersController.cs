@@ -23,9 +23,9 @@ namespace CheckerApi.Controllers
         }
 
         [HttpGet]
-        [Route("{top?}")]
+        [Route("{top}")]
         [ProducesResponseType(typeof(List<BidAudit>), 200)]
-        public IActionResult GetAlertOrders(int top = 10)
+        public IActionResult GetAlertOrders(int top)
         {
             return Ok(Context.DataReadOnly.OrderByDescending(i => i.RecordDate).Take(top).ToList());
         }
