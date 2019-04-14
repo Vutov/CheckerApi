@@ -105,7 +105,7 @@ namespace CheckerApi.Services
             }
         }
 
-        private IEnumerable<List<BidEntry>> GetTotalOrders(bool enableAudit)
+        public IEnumerable<List<BidEntry>> GetTotalOrders(bool enableAudit)
         {
             var totalOrders = new List<List<BidEntry>>();
             foreach (var location in _locations)
