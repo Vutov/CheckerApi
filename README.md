@@ -145,6 +145,8 @@ Note: Kestrel is not made for Production use, it does support https, but its goo
 
 >*Conditions* - show current conditions and are they enabled
 
+*{url}/debug/{condition}/{password}* - executes condition at the moment with all needed for debugging information - input and output. Note: Does not trigger alert.
+
 *{url}/swagger* - shows Swagger UI
 
 *{url}/version* - shows the last boot, environment and name
@@ -266,6 +268,13 @@ Entity Framework Entities - Currently there is no Reposity pattern, DBContext is
 -Price Job - Run once every 1 minute and gathers BTC to BTG price.  It has to be `enabled` and provided with url, regex to gather data. See example of appsettings. This monitoring, if enabled, is used for all Conditions to identify is the alert is just 'hashrush' or geniune alert.
 
 ## Releases:
+1.2.2.1 - 14.04.2019
+```
+Added Debugging for conditions
+
+Hotfix on condition logic
+```
+
 1.2.2.0 - 24.03.2019
 ```
 Added Monitoring of pools
