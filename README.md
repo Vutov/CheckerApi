@@ -62,16 +62,12 @@ Start the bot - ‘dotnet run’
     "Request": "api?method=orders.get&location={location}&algo=36",
     "Locations": [ 0, 1 ]
    },
-   "Pool" : {
-    "Url": null,
-    "Request":  null 
-   },
   "Pool": {
     "Enable": false,
-    "Url": null,
-    "Request": null,
-    "Regex": null,
-    "Denomination": null
+    "Url": "https://example.pool",
+    "Request": "/info",
+    "Regex": "btg.+?([0-9.]+),",
+    "Denomination": "sol"
   },
   "Monitor": {
     "Enable": false,
