@@ -41,15 +41,20 @@ namespace CheckerApi.Jobs
                 return;
             }
 
-            var networkRate = double.Parse(groups[1], CultureInfo.InvariantCulture);
-            var difficulty = double.Parse(groups[2], CultureInfo.InvariantCulture);
-
             var cache = serviceProvider.GetService<IMemoryCache>();
 
-            var denomination = (Denomination) Enum.Parse(typeof(Denomination), config.GetValue<string>("Pool:Denomination"), ignoreCase: true);
+            var configDenomination = config.GetValue<string>("Pool:Denomination");
+            var denomination = (Denomination)Enum.Parse(typeof(Denomination), configDenomination, ignoreCase: true);
+            var networkRate = double.Parse(groups[1], CultureInfo.InvariantCulture);
             var networkRateInMh = DenominationHelper.ToMSol(networkRate, denomination);
             cache.Set(Constants.HashRateKey, networkRateInMh);
-            cache.Set(Constants.DifficultyKey, difficulty);
+
+            // Assume Difficulty is second group
+            if (groups.Count > 2)
+            {
+                var difficulty = double.Parse(groups[2], CultureInfo.InvariantCulture);
+                cache.Set(Constants.DifficultyKey, difficulty);
+            }
         }
     }
 }

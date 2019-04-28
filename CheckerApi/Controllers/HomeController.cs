@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using CheckerApi.Models.DTO;
 using CheckerApi.Models.Entities;
 using CheckerApi.Models.Responses;
 using CheckerApi.Utils;
@@ -38,6 +39,7 @@ namespace CheckerApi.Controllers
             cache.TryGetValue<double>(Constants.HashRateKey, out var networkRate);
             cache.TryGetValue<double>(Constants.DifficultyKey, out var networkDifficulty);
             cache.TryGetValue<double>(Constants.BtcBtgPriceKey, out var price);
+            cache.TryGetValue<BlocksList>(Constants.BlocksInfoKey, out var blocksInfo);
 
             return Ok(new BotStatusResponse
             {
@@ -48,7 +50,9 @@ namespace CheckerApi.Controllers
                 Conditions = conditions,
                 StoredNetworkRate = networkRate,
                 StoredNetworkDifficulty = networkDifficulty,
-                StoredBtcBtgPrice = price
+                StoredBtcBtgPrice = price,
+                StoredBlocks = blocksInfo.Count,
+                StoredBlocksTip = blocksInfo.GetTip().Height,
             });
         }
 
