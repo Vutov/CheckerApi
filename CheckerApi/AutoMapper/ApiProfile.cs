@@ -1,8 +1,9 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
 using CheckerApi.Models.Config;
 using CheckerApi.Models.DTO;
 using CheckerApi.Models.Entities;
+using CheckerApi.Models.Rpc;
+using System;
 
 namespace CheckerApi.AutoMapper
 {
@@ -35,6 +36,21 @@ namespace CheckerApi.AutoMapper
                 .ForMember(
                     dest => dest.Denomination,
                     opt => opt.MapFrom(src => Denomination.Ksol.ToString()))
+                ;
+
+            CreateMap<RpcBlockResult, BlockInfoDTO>()
+                .ForMember(
+                    dest => dest.Hash,
+                    opt => opt.MapFrom(src => src.Result.Hash))
+                .ForMember(
+                    dest => dest.Height,
+                    opt => opt.MapFrom(src => int.Parse(src.Result.Height)))
+                .ForMember(
+                    dest => dest.Time,
+                    opt => opt.MapFrom(src => new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(long.Parse(src.Result.Time))))
+                .ForMember(
+                    dest => dest.PreviousBlockHash,
+                    opt => opt.MapFrom(src => src.Result.PreviousBlockHash))
                 ;
         }
     }

@@ -93,6 +93,19 @@ namespace CheckerApi
                                 startAt: DateTimeOffset.UtcNow.AddSeconds(1)
                             );
                         }
+
+                        var nodeEnabled = config.GetValue<bool>("Node:Enable");
+                        if (priceEnabled)
+                        {
+                            scheduler.AddJob<NodeJob>(
+                                host,
+                                tb => tb.WithSimpleSchedule(x => x
+                                    .WithIntervalInSeconds(15)
+                                    .RepeatForever()
+                                ),
+                                startAt: DateTimeOffset.UtcNow.AddSeconds(2)
+                            );
+                        }
                     }
                 })
                 .Run();

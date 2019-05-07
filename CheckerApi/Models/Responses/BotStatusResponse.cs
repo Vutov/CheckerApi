@@ -12,5 +12,7 @@ namespace CheckerApi.Models.Responses
         public double StoredNetworkRate { get; set; }
         public double StoredNetworkDifficulty { get; set; }
         public double StoredBtcBtgPrice { get; set; }
+        public int StoredBlocks { get; set; }
+        public int StoredBlocksTip { get; set; }
     }
 }

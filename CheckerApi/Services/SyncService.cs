@@ -113,6 +113,14 @@ namespace CheckerApi.Services
                 var client = new RestClient(_url);
                 var request = new RestRequest(_request.Replace("{location}", location.ToString()), Method.GET);
                 var response = client.Execute(request);
+
+                // Bad response body
+                if (string.IsNullOrEmpty(response?.Content))
+                {
+                    _logger.LogWarning("GetTotalOrders empty response body");
+                    continue;
+                }
+
                 var data = JsonConvert.DeserializeObject<ResultDTO>(response.Content);
                 var orders = data?.Result?.Orders?.Select(o => CreateDTO(o, location)).ToList() ?? new List<BidEntry>();
                 totalOrders.Add(orders);
