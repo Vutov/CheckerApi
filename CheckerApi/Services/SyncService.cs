@@ -18,6 +18,12 @@ namespace CheckerApi.Services
 {
     public class SyncService : ISyncService
     {
+        private readonly Dictionary<string, int> datacenters = new Dictionary<string, int>
+        {
+            { "EU", 0 },
+            { "US", 1 }
+        };
+
         private readonly ILogger<SyncService> _logger;
         private readonly IMapper _mapper;
         private readonly INotificationManager _notification;
@@ -25,7 +31,7 @@ namespace CheckerApi.Services
         private readonly IAuditManager _audit;
         private readonly ApiContext _context;
 
-        private readonly int[] _locations;
+        private readonly string[] _locations;
         private readonly int _alertInterval;
         private readonly string _alertMessage;
         private readonly string _url;
@@ -45,7 +51,7 @@ namespace CheckerApi.Services
             _alertMessage = config.GetValue<string>("Api:Alert:Message");
             _url = config.GetValue<string>("NiceHash:Url");
             _request = config.GetValue<string>("NiceHash:Request");
-            _locations = config.GetSection("NiceHash:Locations").Get<int[]>();
+            _locations = config.GetSection("NiceHash:Locations").Get<string[]>();
         }
 
         public Result RunSync()
@@ -110,24 +116,36 @@ namespace CheckerApi.Services
             var totalOrders = new List<List<BidEntry>>();
             foreach (var location in _locations)
             {
-                var client = new RestClient(_url);
-                var request = new RestRequest(_request.Replace("{location}", location.ToString()), Method.GET);
-                var response = client.Execute(request);
-
-                // Bad response body
-                if (string.IsNullOrEmpty(response?.Content))
+                int page = 0;
+                var pagedList = new List<BidEntry>();
+                do
                 {
-                    _logger.LogWarning("GetTotalOrders empty response body");
-                    continue;
-                }
+                    var client = new RestClient(_url);
+                    var request = new RestRequest(_request.Replace("{location}", location.ToString()).Replace("{page}", page.ToString()), Method.GET);
+                    var response = client.Execute(request);
 
-                var data = JsonConvert.DeserializeObject<ResultDTO>(response.Content);
-                var orders = data?.Result?.Orders?.Select(o => CreateDTO(o, location)).ToList() ?? new List<BidEntry>();
-                totalOrders.Add(orders);
+                    // Bad response body
+                    if (string.IsNullOrEmpty(response?.Content))
+                    {
+                        _logger.LogWarning("GetTotalOrders empty response body");
+                        continue;
+                    }
 
+                    var data = JsonConvert.DeserializeObject<ResultDTO>(response.Content);
+                    if (data?.Orders?.Any() == false)
+                    {
+                        break;
+                    }
+
+                    page++;
+                    List<BidEntry> orders = data?.Orders?.Select(o => CreateDTO(o, location)).ToList() ?? new List<BidEntry>();
+                    pagedList.AddRange(orders);
+                } while (true);
+
+                totalOrders.Add(pagedList);
                 if (enableAudit)
                 {
-                    var auditOrders = orders?.Where(o => o.Alive && o.AcceptedSpeed > 0).ToList();
+                    var auditOrders = pagedList?.Where(o => o.Alive && o.AcceptedSpeed > 0).ToList();
                     _audit.CreateAudit(auditOrders);
                 }
             }
@@ -135,10 +153,24 @@ namespace CheckerApi.Services
             return totalOrders;
         }
 
-        private BidEntry CreateDTO(BidDTO order, int location)
+        private BidEntry CreateDTO(BidDTO order, string location)
         {
             var data = _mapper.Map<BidEntry>(order);
-            data.NiceHashDataCenter = location;
+
+            int loc;
+            if (datacenters.ContainsKey(location))
+            {
+                loc = datacenters[location];
+            }
+            else if (int.TryParse(location, out int l))
+            {
+                loc = l;
+            } else
+            {
+                loc = 0;
+            }
+
+            data.NiceHashDataCenter = loc;
 
             return data;
         }

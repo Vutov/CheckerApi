@@ -30,9 +30,8 @@ namespace CheckerApi.Services.Conditions
                 return (info, " No network hashrate present", string.Empty);
             }
 
-            var niceHashRateInMh = totalOrderHash * 1000;
-            var percentage = (niceHashRateInMh / networkRateInMh) * 100;
-            return (info, $"current exposure is {percentage:F2}% ", $"NiceHash rate: {niceHashRateInMh:F6} Mh/s, BTG Network Rate {networkRateInMh:F6} Mh/s");
+            var percentage = (totalOrderHash / networkRateInMh) * 100;
+            return (info, $"current exposure is {percentage:F2}% ", $"NiceHash rate: {totalOrderHash:F6} Mh/s, BTG Network Rate {networkRateInMh:F6} Mh/s");
         }
     }
 }

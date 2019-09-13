@@ -11,7 +11,7 @@ namespace CheckerApi.Services.Conditions
     [GlobalCondition(5)]
     public class TotalMarketCondition : Condition
     {
-        private static readonly int attackResetMin = 10;
+        private static readonly int AttackResetMin = 10;
         private static DateTime _attackStart;
         private static DateTime? _lastCheck;
 
@@ -29,7 +29,6 @@ namespace CheckerApi.Services.Conditions
             var aliveOrders = orders.Where(o => o.Alive).ToList();
             var totalOrderHash = aliveOrders.Sum(o => o.AcceptedSpeed);
             var averagePrice = aliveOrders.Where(o => o.AcceptedSpeed > 0).Average(o => o.Price);
-            var niceHashRateInMh = totalOrderHash * 1000; // in Mh/s
 
             var hasRate = Cache.TryGetValue<double>(Constants.HashRateKey, out var networkRateInMh);
 
@@ -43,16 +42,16 @@ namespace CheckerApi.Services.Conditions
                 modifier = 1;
             }
 
-            if (hasRate && niceHashRateInMh * threshold >= networkRateInMh * modifier)
+            if (hasRate && totalOrderHash * threshold >= networkRateInMh * modifier)
             {
                 _attackStart = GetNewAttackStart();
 
                 string condition = $"Condition: " +
-                                   $"Active Orders Hash ({niceHashRateInMh:F2} Mh/s) above or equal to " +
-                                   $"{threshold * 100:F2}% (actual {niceHashRateInMh / networkRateInMh * 100:F2}%) of " +
+                                   $"Active Orders Hash ({totalOrderHash:F2} Mh/s) above or equal to " +
+                                   $"{threshold * 100:F2}% (actual {totalOrderHash / networkRateInMh * 100:F2}%) of " +
                                    $"Total Network Hash ({networkRateInMh:F2}) Mh/s " +
                                    $"{this.CreateIsProfitableMessage(averagePrice, "Average Price of ")} " +
-                                   $"{this.AnalyzePools(poolData, niceHashRateInMh)}" +
+                                   $"{this.AnalyzePools(poolData, totalOrderHash)}" +
                                    $"{this.BlockInfo()}";
                 string message = $"{MessagePrefix}Market Total Threshold ALERT - 'AT RISK'. {CreateShortIsProfitableMessage(averagePrice)} ";
 
@@ -67,7 +66,7 @@ namespace CheckerApi.Services.Conditions
                         NiceHashId = "Aggregation",
                         NiceHashDataCenter = 0,
                         LimitSpeed = aliveOrders.Sum(o => o.LimitSpeed),
-                        AcceptedSpeed = aliveOrders.Sum(o => o.AcceptedSpeed) * 1000, // in Mh/s
+                        AcceptedSpeed = aliveOrders.Sum(o => o.AcceptedSpeed), // in Mh/s
                     },
                     Condition = condition,
                     Message = message
@@ -79,7 +78,7 @@ namespace CheckerApi.Services.Conditions
 
         private DateTime GetNewAttackStart()
         {
-            if (!_lastCheck.HasValue || _lastCheck.Value.AddMinutes(attackResetMin) < DateTime.UtcNow)
+            if (!_lastCheck.HasValue || _lastCheck.Value.AddMinutes(AttackResetMin) < DateTime.UtcNow)
             {
                 _lastCheck = DateTime.UtcNow;
                 return DateTime.UtcNow;

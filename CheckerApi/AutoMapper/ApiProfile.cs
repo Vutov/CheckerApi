@@ -19,6 +19,12 @@ namespace CheckerApi.AutoMapper
                     dest => dest.NiceHashId,
                     opts => opts.MapFrom(src => src.Id))
                 .ForMember(
+                    dest => dest.Type,
+                    opts => opts.MapFrom(src => src.Type.Code))
+                .ForMember(
+                    dest => dest.Algo,
+                    opts => opts.MapFrom(src => src.Algo.Order))
+                .ForMember(
                     dest => dest.RecordDate,
                     opts => opts.MapFrom(src => DateTime.UtcNow))
                 ;

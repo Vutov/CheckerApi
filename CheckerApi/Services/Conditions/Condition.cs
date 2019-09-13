@@ -39,12 +39,12 @@ namespace CheckerApi.Services.Conditions
         protected string CreateMessage(BidEntry order)
         {
             var speedLimit = order.LimitSpeed == 0 ? "NO" : order.LimitSpeed.ToString(CultureInfo.InvariantCulture);
-            return $"{CreateShortIsProfitableMessage(order.Price)} {order.AcceptedSpeed * 1000} MSol DELIVERED AT {order.RecordDate:G} WITH {speedLimit} LIMIT, PAYING {order.Price} ON ORDER ID {order.NiceHashId} AT {_locationDict[order.NiceHashDataCenter]} SERVER";
+            return $"{CreateShortIsProfitableMessage(order.Price)} {order.AcceptedSpeed} MSol DELIVERED AT {order.RecordDate:G} WITH {speedLimit} LIMIT, PAYING {order.Price} ON ORDER ID {order.NiceHashId} AT {_locationDict[order.NiceHashDataCenter]} SERVER";
         }
 
         protected string CreateMessageForProgress(BidEntry order)
         {
-            return $"{order.AcceptedSpeed * 1000} MSol DELIVERED, ID {order.NiceHashId} AT {_locationDict[order.NiceHashDataCenter]} SERVER";
+            return $"{order.AcceptedSpeed} MSol DELIVERED, ID {order.NiceHashId} AT {_locationDict[order.NiceHashDataCenter]} SERVER";
         }
 
         protected string Sha256(string randomString)
