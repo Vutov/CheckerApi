@@ -34,11 +34,11 @@ namespace CheckerApi.Context
                 {
                     new ApiConfiguration()
                     {
-                        AcceptedSpeed = 0.02,
+                        AcceptedSpeed = 2,
                         LimitSpeed = 11,
                         PriceThreshold = 0.04,
                         LastNotification = DateTime.UtcNow.AddMinutes(-15),
-                        MinimalAcceptedSpeed = 0.003,
+                        MinimalAcceptedSpeed = 0.3,
                         AcceptedPercentThreshold = 0.1,
                         EnableAudit = true,
                         TotalHashThreshold = 0.8,

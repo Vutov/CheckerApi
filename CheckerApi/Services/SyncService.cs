@@ -21,7 +21,7 @@ namespace CheckerApi.Services
         private readonly Dictionary<string, int> datacenters = new Dictionary<string, int>
         {
             { "EU", 0 },
-            { "US", 1 }
+            { "USA", 1 }
         };
 
         private readonly ILogger<SyncService> _logger;
