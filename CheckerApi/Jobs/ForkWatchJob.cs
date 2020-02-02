@@ -56,7 +56,7 @@ namespace CheckerApi.Jobs
 
         public void Execute()
         {
-            rpcConfig = JobCommon.GetRpcConfig(config);
+            rpcConfig = Job.GetRpcConfig(config);
             // compare chain tips
             var lastSeenTips = cache.GetOrCreate<ChainTip[]>(Constants.LastSeenTipKey, entry => null);
             ChainTip[] tips = null;
