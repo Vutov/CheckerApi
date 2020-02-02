@@ -83,7 +83,7 @@ namespace CheckerApi.Jobs
 
             if (tips == null || tips.Length == 0)
             {
-                logger.LogWarning("ForkWatch: Got bad tip");
+                logger.LogWarning("ForkWatch: Got malformed tip from RPC");
             }
 
             // short-circurit: no new block found
