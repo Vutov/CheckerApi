@@ -38,8 +38,8 @@ namespace CheckerApi.Jobs
 
     class VirtualCheckpoint
     {
-        public int Height;
-        public string Hash;
+        public int Height { get; set; }
+        public string Hash { get; set; }
     }
 
     class WatchJobExecutor
