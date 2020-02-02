@@ -1,8 +1,8 @@
-﻿using CheckerApi.Models.Config;
-using System;
+﻿using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Net;
+using System.Threading.Tasks;
+using CheckerApi.Models.Config;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -43,7 +43,8 @@ namespace CheckerApi.Jobs
                 }
             });
         }
-        public static RpcConfig GetRpcConfig (IConfiguration config)
+
+        public RpcConfig GetNodeRpcConfig(IConfiguration config)
         {
             return new RpcConfig()
             {

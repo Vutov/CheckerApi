@@ -28,7 +28,7 @@ namespace CheckerApi.Jobs
             var logger = serviceProvider.GetService<ILogger<NodeJob>>();
             var mapper = serviceProvider.GetService<IMapper>();
 
-            var rpcConfig = GetRpcConfig(config);
+            var rpcConfig = GetNodeRpcConfig(config);
 
             var cache = serviceProvider.GetService<IMemoryCache>();
             var difficultyResult = dataExtractor.RpcCall(rpcConfig, "getdifficulty");

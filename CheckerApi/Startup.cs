@@ -42,6 +42,7 @@ namespace CheckerApi
             services.AddTransient<ICompressService, CompressService>();
             services.AddTransient<IPoolPullService, PoolPullService>();
             services.AddTransient<IDataExtractorService, DataExtractorService>();
+            services.AddTransient<IForkWatchService, ForkWatchService>();
 
             services.AddMvc();
         }

@@ -23,7 +23,7 @@ namespace CheckerApi.Models.Rpc
         public int Confirmations { get; set; }
     }
 
-    public class RpcBlockInfo : RpcBlockInfoBase 
+    public class RpcBlockInfo : RpcBlockInfoBase
     {
         [JsonProperty("tx")]
         public string[] Tx { get; set; }

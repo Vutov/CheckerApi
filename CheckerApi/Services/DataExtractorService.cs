@@ -42,20 +42,6 @@ namespace CheckerApi.Services
             return Result<IEnumerable<string>>.Ok(match.Groups.Select(g => g.Value));
         }
 
-        private JArray ObjectToJArray(object[] objs)
-        {
-            var a = new JArray();
-            foreach(var o in objs)
-            {
-                JValue val;
-                if (o is int) val = new JValue((int)o);
-                else if (o is string) val = new JValue((string)o);
-                else val = new JValue(o.ToString());
-                a.Add(val);
-            }
-            return a;
-        }
-
         public Result<string> RpcCall(RpcConfig config, string method, params object[] parameters)
         {
             var result = this.RpcCall<RpcResult>(config, method, parameters);
@@ -93,6 +79,31 @@ namespace CheckerApi.Services
             {
                 return Result<T>.Fail($"RPC serialization fail '{method}' at '{config.Url}/{config.Port}'", $"object type: '{nameof(T)}'", $"ex: '{ex}'");
             }
+        }
+
+        private JArray ObjectToJArray(object[] objs)
+        {
+            var a = new JArray();
+            foreach (var o in objs)
+            {
+                JValue val;
+                if (o is int)
+                {
+                    val = new JValue((int)o);
+                }
+                else if (o is string)
+                {
+                    val = new JValue((string)o);
+                }
+                else
+                {
+                    val = new JValue(o.ToString());
+                }
+
+                a.Add(val);
+            }
+
+            return a;
         }
     }
 }
