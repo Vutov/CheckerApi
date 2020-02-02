@@ -7,7 +7,7 @@ namespace CheckerApi.Services.Interfaces
     public interface IDataExtractorService
     {
         Result<IEnumerable<string>> GetData(string url, string req, string pattern);
-        Result<T> RpcCall<T>(RpcConfig config, string method, params string[] parameters) where T : class;
-        Result<string> RpcCall(RpcConfig config, string method, params string[] parameters);
+        Result<T> RpcCall<T>(RpcConfig config, string method, params object[] parameters) where T : class;
+        Result<string> RpcCall(RpcConfig config, string method, params object[] parameters);
     }
 }
