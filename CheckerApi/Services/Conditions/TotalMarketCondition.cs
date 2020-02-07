@@ -36,7 +36,7 @@ namespace CheckerApi.Services.Conditions
             // a.Power > 100 % and NOT profitable
             // or
             // b.Power > 150 % and likely FOR PROFIT
-            var modifier = 1.5;
+            var modifier = 1; // 1.5; Due to high volume moved to 1
             if (IsOverpaying(averagePrice))
             {
                 modifier = 1;
