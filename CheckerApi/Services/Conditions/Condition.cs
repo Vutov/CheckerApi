@@ -110,7 +110,7 @@ namespace CheckerApi.Services.Conditions
         /// </summary>
         private double CalculateProfitThreshold(double price, double networkDifficulty)
         {
-            var threshold = price * 131835937.5d / networkDifficulty;
+            var threshold = price * 65917968.75d / networkDifficulty;
             return threshold;
         }
     }
