@@ -28,16 +28,7 @@ namespace CheckerApi.Jobs
             var logger = serviceProvider.GetService<ILogger<NodeJob>>();
             var mapper = serviceProvider.GetService<IMapper>();
 
-            var rpcConfig = new RpcConfig()
-            {
-                Url = config.GetValue<string>("Node:Url"),
-                Port = config.GetValue<int>("Node:RpcPort"),
-                Credentials = new NetworkCredential()
-                {
-                    UserName = config.GetValue<string>("Node:RpcUser"),
-                    Password = config.GetValue<string>("Node:RpcPass")
-                }
-            };
+            var rpcConfig = GetNodeRpcConfig(config);
 
             var cache = serviceProvider.GetService<IMemoryCache>();
             var difficultyResult = dataExtractor.RpcCall(rpcConfig, "getdifficulty");

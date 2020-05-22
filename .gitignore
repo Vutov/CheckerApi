@@ -278,3 +278,5 @@ errorlogs.txt
 version.txt
 *launchSettings.json
 AuditZips/
+
+.vscode

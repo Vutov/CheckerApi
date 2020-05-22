@@ -106,6 +106,19 @@ namespace CheckerApi
                                 startAt: DateTimeOffset.UtcNow.AddSeconds(2)
                             );
                         }
+
+                        var forkWatchEnabled = config.GetValue<bool>("ForkWatch:Enable");
+                        if (forkWatchEnabled)
+                        {
+                            scheduler.AddJob<ForkWatchJob>(
+                                host,
+                                tb => tb.WithSimpleSchedule(x => x
+                                    .WithIntervalInSeconds(10)
+                                    .RepeatForever()
+                                ),
+                                startAt: DateTimeOffset.UtcNow.AddSeconds(3)
+                            );
+                        }
                     }
                 })
                 .Run();

@@ -140,7 +140,8 @@ namespace CheckerApi.Services
                     page++;
                     List<BidEntry> orders = data?.Orders?.Select(o => CreateDTO(o, location)).ToList() ?? new List<BidEntry>();
                     pagedList.AddRange(orders);
-                } while (true);
+                }
+                while (true);
 
                 totalOrders.Add(pagedList);
                 if (enableAudit)
@@ -165,7 +166,8 @@ namespace CheckerApi.Services
             else if (int.TryParse(location, out int l))
             {
                 loc = l;
-            } else
+            }
+            else
             {
                 loc = 0;
             }
